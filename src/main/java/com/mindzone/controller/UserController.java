@@ -2,6 +2,7 @@ package com.mindzone.controller;
 
 import com.mindzone.model.User;
 import com.mindzone.repository.UserRepository;
+import com.mindzone.service.MailService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -19,6 +20,8 @@ public class UserController {
 
     private UserRepository userRepository;
 
+    private MailService mailService;
+
     @PostMapping("/users")
     public User postUser() {
         return userRepository.save(new User("Vinícius", 22));
@@ -27,6 +30,11 @@ public class UserController {
     @GetMapping("/users")
     public List<User> getUsers() {
         return userRepository.findAll();
+    }
+
+    @PostMapping("/sendMail")
+    public String sendMail() {
+        return mailService.sendMail();
     }
 
 }
