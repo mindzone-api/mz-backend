@@ -3,9 +3,7 @@ package com.mindzone.controller;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
@@ -15,11 +13,10 @@ import org.springframework.http.HttpMethod;
 import static com.mindzone.util.Constants.*;
 
 @RestController
+@RequestMapping(V1 + "/auth")
 public class AuthenticationController {
 
-
-
-    @PostMapping("/api/auth/token")
+    @GetMapping("/token")
     public ResponseEntity<?> getToken(@RequestBody AuthCodeRequest authCodeRequest) {
         RestTemplate restTemplate = new RestTemplate();
 
