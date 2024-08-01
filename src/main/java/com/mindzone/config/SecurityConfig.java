@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.mindzone.util.Constants.WHITE_LIST_URL;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -19,11 +19,17 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(WHITE_LIST_URL).permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/**").fullyAuthenticated()
                 )
-                .oauth2Login(withDefaults());
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(withDefaults())
+                )
+                .cors(withDefaults());
 
         return http.build();
     }
 }
+
