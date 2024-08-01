@@ -1,13 +1,13 @@
 package com.mindzone.controller;
 
 
+import com.mindzone.dto.request.SignUpRequest;
+import com.mindzone.dto.response.SignUpResponse;
+import com.mindzone.service.impl.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import java.security.Principal;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import static com.mindzone.util.Constants.V1;
 
@@ -17,15 +17,11 @@ import static com.mindzone.util.Constants.V1;
 @RequestMapping(V1 + "/user")
 public class UserController {
 
-    @GetMapping("/email")
-    public String getUserEmail(JwtAuthenticationToken jwtAuth) {
-        return (String) jwtAuth.getTokenAttributes().get("email");
-    }
+    UserService userService;
 
-    @GetMapping("/test")
-    public Principal test(Principal principal) {
-        return principal;
+    @PostMapping("/signup")
+    public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
+        return ResponseEntity.ok(userService.signUp(signUpRequest));
     }
-
 
 }
