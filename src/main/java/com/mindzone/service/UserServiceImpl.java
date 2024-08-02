@@ -18,7 +18,6 @@ import static com.mindzone.exception.ExceptionMessages.*;
 
 @Service
 @AllArgsConstructor
-
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
