@@ -2,6 +2,7 @@ package com.mindzone.service;
 
 import com.mindzone.dto.request.SignUpRequest;
 import com.mindzone.dto.response.SignUpResponse;
+import com.mindzone.dto.response.UserResponse;
 import com.mindzone.enums.Role;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.user.User;
@@ -28,13 +29,29 @@ public class UserServiceImpl implements UserService {
         this.userRepository.save(user);
     }
 
-    private User getUser(String email) {
+    private User getByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiRequestException(USER_NOT_FOUND));
     }
 
+    private User getById(String id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ApiRequestException(USER_NOT_FOUND));
+    }
+
+    @Override
+    public UserResponse get(String id) {
+        User user = getById(id);
+        return m.map(user, UserResponse.class);
+    }
+
+    @Override
+    public User validateUser(JwtAuthenticationToken token) {
+        return getByEmail((String) token.getTokenAttributes().get("email"));
+    }
+
     public User validateUser(JwtAuthenticationToken token, Role role) {
-        User user = getUser((String) token.getTokenAttributes().get("email"));
+        User user = validateUser(token);
         if (user.getRole() != role) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }

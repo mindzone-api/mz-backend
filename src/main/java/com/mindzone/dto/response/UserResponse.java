@@ -8,11 +8,16 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class SignUpResponse {
+public class UserResponse {
+
     private String id;
-    private String email;
+    private String name;
+    private String profilePictureURL;
+    private Date birthDate;
     private Role role;
+    private ProfessionalInfo professionalInfo;
+
 }
