@@ -1,5 +1,7 @@
-package com.mindzone.model;
+package com.mindzone.model.user;
 
+import com.mindzone.enums.Role;
+import com.mindzone.model.AbstractModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = "users")
@@ -16,6 +19,10 @@ import java.io.Serializable;
 public class User extends AbstractModel implements Serializable {
 
     private String name;
-    private int age;
+    private String email;
+    private String profilePictureURL;
+    private Date birthDate;
+    private Role role;
+    private ProfessionalInfo professionalInfo;
 
 }
