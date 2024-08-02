@@ -16,7 +16,6 @@ import java.util.Map;
 @Data
 public class ProfessionalInfo {
 
-    private String professionalId;
     private Profession profession;
     private Date activeUntil;
     private String description;
@@ -30,7 +29,7 @@ public class ProfessionalInfo {
     private Approach approach;
     private String address;
     private String city;
-    private String professionCode;
+    private String professionalCode;
     Map<DayOfWeek, TimeRange> workingSchedule;
     private List<PatientFeedback> feedbacks;
 }
