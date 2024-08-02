@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.util.Date;
@@ -14,7 +15,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ProfessionalInfo {
+public class ProfessionalInfo  implements Serializable {
 
     private Profession profession;
     private Date activeUntil;

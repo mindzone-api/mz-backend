@@ -3,9 +3,11 @@ package com.mindzone.controller;
 
 import com.mindzone.dto.request.SignUpRequest;
 import com.mindzone.dto.response.SignUpResponse;
+import com.mindzone.dto.response.UserResponse;
 import com.mindzone.service.impl.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import static com.mindzone.util.Constants.V1;
@@ -20,6 +22,12 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
         return ResponseEntity.ok(userService.signUp(signUpRequest));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> get(JwtAuthenticationToken token, @PathVariable String id) {
+        userService.validateUser(token);
+        return ResponseEntity.ok(userService.get(id));
     }
 
 }
