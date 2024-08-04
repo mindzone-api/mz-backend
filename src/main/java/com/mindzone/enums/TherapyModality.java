@@ -1,6 +1,6 @@
 package com.mindzone.enums;
 
-public enum SessionModality {
+public enum TherapyModality {
     IN_PERSON,
     ONLINE
 }
