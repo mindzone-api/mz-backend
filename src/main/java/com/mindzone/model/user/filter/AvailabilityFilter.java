@@ -15,7 +15,6 @@ public class AvailabilityFilter implements Filter{
     private List<WeekDayAvailability> availability;
     private AvailabilitySearchType availabilitySearchType;
 
-
     @Override
     public void apply(Query query) {
         if (availability != null && !availability.isEmpty()) {

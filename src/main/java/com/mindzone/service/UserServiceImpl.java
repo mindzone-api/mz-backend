@@ -12,6 +12,7 @@ import com.mindzone.repository.UserRepository;
 import com.mindzone.service.impl.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -86,6 +87,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable("user")
     public Page<User> search(SearchFilter filter) {
         return search.search(filter);
     }
