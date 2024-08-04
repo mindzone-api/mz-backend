@@ -1,7 +1,7 @@
 package com.mindzone.dto.request;
 
 import com.mindzone.enums.*;
-import com.mindzone.model.user.WeekDayAvailability;
+import com.mindzone.model.user.WeekDaySchedule;
 import com.mindzone.model.user.filter.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +24,7 @@ public class SearchFilter implements Serializable {
     private List<Speciality> specialities;
     private List<HealthPlan> acceptedHealthPlans;
 
-    private List<WeekDayAvailability> availability;
+    private List<WeekDaySchedule> availability;
     private AvailabilitySearchType availabilitySearchType;
 
     private String name;

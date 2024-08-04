@@ -2,7 +2,7 @@ package com.mindzone.model.user.filter;
 
 import com.mindzone.enums.AvailabilitySearchType;
 import com.mindzone.model.user.TimeRange;
-import com.mindzone.model.user.WeekDayAvailability;
+import com.mindzone.model.user.WeekDaySchedule;
 import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -12,14 +12,14 @@ import java.util.List;
 
 @AllArgsConstructor
 public class AvailabilityFilter implements Filter{
-    private List<WeekDayAvailability> availability;
+    private List<WeekDaySchedule> availability;
     private AvailabilitySearchType availabilitySearchType;
 
     @Override
     public void apply(Query query) {
         if (availability != null && !availability.isEmpty()) {
             List<Criteria> criteriaList = new ArrayList<>();
-            for (WeekDayAvailability filterAvailability : availability) {
+            for (WeekDaySchedule filterAvailability : availability) {
                 for (TimeRange filterTimeRange : filterAvailability.getDaySchedule()) {
                     criteriaList.add(
                             Criteria.where("professionalInfo.availability")

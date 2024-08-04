@@ -30,6 +30,6 @@ public class ProfessionalInfo  implements Serializable {
     private List<String> clinicPhotos;
 
     private String professionalCode;
-    private List<WeekDayAvailability> availability;
+    private List<WeekDaySchedule> availability;
     private List<PatientFeedback> feedbacks;
 }
