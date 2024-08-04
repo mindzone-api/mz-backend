@@ -1,6 +1,7 @@
 package com.mindzone.dto.response;
 
 import com.mindzone.enums.Role;
+import com.mindzone.enums.State;
 import com.mindzone.model.user.ProfessionalInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,5 +20,8 @@ public class UserResponse {
     private Date birthDate;
     private Role role;
     private ProfessionalInfo professionalInfo;
+    private String neighborhood;
+    private String city;
+    private State state;
 
 }

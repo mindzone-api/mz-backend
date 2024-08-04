@@ -1,4 +1,4 @@
-package com.mindzone.util;
+package com.mindzone.constants;
 
 public class Constants {
 

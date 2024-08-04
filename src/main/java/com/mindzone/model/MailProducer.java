@@ -1,11 +1,11 @@
-package com.mindzone.util;
+package com.mindzone.model;
 
 import com.mindzone.dto.MailDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
-import static com.mindzone.util.Constants.RABBIT_MAIL_ROUTING_KEY;
-import static com.mindzone.util.Constants.RABBIT_MAIL_TOPIC_EXCHANGE;
+import static com.mindzone.constants.Constants.RABBIT_MAIL_ROUTING_KEY;
+import static com.mindzone.constants.Constants.RABBIT_MAIL_TOPIC_EXCHANGE;
 
 @Service
 public class MailProducer {

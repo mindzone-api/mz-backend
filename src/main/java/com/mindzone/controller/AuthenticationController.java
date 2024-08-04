@@ -2,7 +2,6 @@ package com.mindzone.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +9,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
-import static com.mindzone.util.Constants.*;
+import static com.mindzone.constants.Constants.*;
 
 @RestController
 @RequestMapping(V1 + "/auth")

@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,19 +18,19 @@ import java.util.Map;
 public class ProfessionalInfo  implements Serializable {
 
     private Profession profession;
+    private List<SessionModality> sessionModalities;
+    private List<PaymentMethod> paymentMethods;
+    private Approach approach;
+    private List<Speciality> specialities;
+    private List<HealthPlan> acceptedHealthPlans;
+
     private Date activeUntil;
     private String description;
-    private Gender gender;
-    private SessionModality sessionModality;
-    private List<HealthPlan> acceptedHealthPlans;
     private BigDecimal pricePerSession;
+    private Duration sessionDuration;
     private List<String> clinicPhotos;
-    private List<PaymentMethod> paymentMethods;
-    private List<Speciality> specialities;
-    private Approach approach;
-    private String address;
-    private String city;
+
     private String professionalCode;
-    Map<DayOfWeek, TimeRange> workingSchedule;
+    private List<WeekDayAvailability> availability;
     private List<PatientFeedback> feedbacks;
 }

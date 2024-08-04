@@ -1,5 +1,8 @@
 package com.mindzone.dto.request;
 
+import com.mindzone.enums.Gender;
+import com.mindzone.enums.Role;
+import com.mindzone.enums.State;
 import com.mindzone.model.user.ProfessionalInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,5 +18,10 @@ public class SignUpRequest {
     private String email;
     private String profilePictureURL;
     private Date birthDate;
+    private Gender gender;
+    private String address;
+    private String neighborhood;
+    private String city;
+    private State state;
     private ProfessionalInfo professionalInfo;
 }
