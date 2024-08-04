@@ -6,11 +6,12 @@ import com.mindzone.dto.response.SignUpResponse;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.service.impl.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-import static com.mindzone.util.Constants.V1;
+import static com.mindzone.constants.Constants.V1;
 
 @RestController
 @AllArgsConstructor
@@ -21,7 +22,7 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
-        return ResponseEntity.ok(userService.signUp(signUpRequest));
+        return new ResponseEntity<>(userService.signUp(signUpRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

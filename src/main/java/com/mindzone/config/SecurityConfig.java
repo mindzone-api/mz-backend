@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.mindzone.util.Constants.WHITELIST_ENDPOINTS;
+import static com.mindzone.constants.Constants.WHITELIST_ENDPOINTS;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration

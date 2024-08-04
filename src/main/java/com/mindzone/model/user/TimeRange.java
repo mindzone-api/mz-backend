@@ -14,15 +14,14 @@ import static com.mindzone.exception.ExceptionMessages.INVALID_TIME_RANGE;
 @Data
 public class TimeRange implements Serializable {
 
-    private LocalTime startsAt;
-    private LocalTime endsAt;
+    private Integer startsAt; // minutes since midnight
+    private Integer endsAt; // minutes since midnight
 
-    public TimeRange(LocalTime startsAt, LocalTime endsAt) {
-        if (endsAt.isBefore(startsAt)) {
+    public TimeRange(Integer startsAt, Integer endsAt) {
+        if (endsAt < startsAt) {
             throw new ApiRequestException(INVALID_TIME_RANGE);
         }
         this.startsAt = startsAt;
         this.endsAt = endsAt;
     }
-
 }
