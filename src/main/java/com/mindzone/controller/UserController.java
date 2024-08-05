@@ -2,9 +2,8 @@ package com.mindzone.controller;
 
 
 import com.mindzone.dto.request.SignUpRequest;
-import com.mindzone.dto.response.SignUpResponse;
 import com.mindzone.dto.response.UserResponse;
-import com.mindzone.service.impl.UserService;
+import com.mindzone.service.interfaces.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<UserResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
         return new ResponseEntity<>(userService.signUp(signUpRequest), HttpStatus.CREATED);
     }
 

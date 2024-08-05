@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
 public class ProfessionalInfo  implements Serializable {
 
     private Profession profession;
-    private List<SessionModality> sessionModalities;
+    private List<TherapyModality> therapyModalities;
     private List<PaymentMethod> paymentMethods;
     private Approach approach;
     private List<Speciality> specialities;
@@ -31,6 +30,6 @@ public class ProfessionalInfo  implements Serializable {
     private List<String> clinicPhotos;
 
     private String professionalCode;
-    private List<WeekDayAvailability> availability;
+    private List<WeekDaySchedule> availability;
     private List<PatientFeedback> feedbacks;
 }

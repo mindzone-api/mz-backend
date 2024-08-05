@@ -1,7 +1,7 @@
 package com.mindzone.dto.request;
 
 import com.mindzone.enums.*;
-import com.mindzone.model.user.WeekDayAvailability;
+import com.mindzone.model.user.WeekDaySchedule;
 import com.mindzone.model.user.filter.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,13 +18,13 @@ public class SearchFilter implements Serializable {
 
     private List<Profession> professions;
     private List<Gender> genders;
-    private List<SessionModality> sessionModalities;
+    private List<TherapyModality> therapyModalities;
     private List<PaymentMethod> paymentMethods;
     private List<Approach> approaches;
     private List<Speciality> specialities;
     private List<HealthPlan> acceptedHealthPlans;
 
-    private List<WeekDayAvailability> availability;
+    private List<WeekDaySchedule> availability;
     private AvailabilitySearchType availabilitySearchType;
 
     private String name;
@@ -45,7 +45,7 @@ public class SearchFilter implements Serializable {
         List<Filter> filters = new ArrayList<>();
         filters.add(new ProfessionsFilter(professions));
         filters.add(new GendersFilter(genders));
-        filters.add(new SessionModalitiesFilter(sessionModalities));
+        filters.add(new TherapyModalityFilter(therapyModalities));
         filters.add(new PaymentMethodsFilter(paymentMethods));
         filters.add(new ApproachesFilter(approaches));
         filters.add(new AcceptedHealthPlansFilter(acceptedHealthPlans));

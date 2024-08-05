@@ -1,7 +1,7 @@
-package com.mindzone.service;
+package com.mindzone.service.impl;
 
 import com.mindzone.dto.MailDTO;
-import com.mindzone.service.impl.MailService;
+import com.mindzone.service.interfaces.MailService;
 import com.mindzone.model.MailProducer;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
