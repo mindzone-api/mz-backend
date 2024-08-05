@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class TherapyRequest {
-
-    private String patientId;
     private String professionalId;
     private TherapyModality therapyModality;
 }

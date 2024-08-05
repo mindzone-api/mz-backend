@@ -33,8 +33,9 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public TherapyResponse requestTherapy(TherapyRequest therapyRequest) {
+    public TherapyResponse requestTherapy(TherapyRequest therapyRequest, String userId) {
         Therapy therapy = m.map(therapyRequest, Therapy.class);
+        therapy.setPatientId(userId);
         therapyRepository.save(therapy);
         return m.map(therapy, TherapyResponse.class);
     }

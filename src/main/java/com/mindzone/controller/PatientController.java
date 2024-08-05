@@ -34,8 +34,8 @@ public class PatientController {
 
     @PostMapping("/ask-for-therapy")
     public ResponseEntity<TherapyResponse> requestTherapy(JwtAuthenticationToken token, @RequestBody TherapyRequest therapyRequest) {
-        userService.validateUser(token, Role.PATIENT);
-        return ResponseEntity.ok(patientService.requestTherapy(therapyRequest));
+        User user = userService.validateUser(token, Role.PATIENT);
+        return ResponseEntity.ok(patientService.requestTherapy(therapyRequest, user.getId()));
     }
 
     @GetMapping("/my-professionals")
