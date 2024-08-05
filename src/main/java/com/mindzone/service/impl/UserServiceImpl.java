@@ -1,7 +1,8 @@
-package com.mindzone.service;
+package com.mindzone.service.impl;
 
 import com.mindzone.dto.request.SearchFilter;
 import com.mindzone.dto.request.SignUpRequest;
+import com.mindzone.dto.response.ListedProfessional;
 import com.mindzone.dto.response.SignUpResponse;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.enums.Role;
@@ -9,7 +10,7 @@ import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.user.User;
 import com.mindzone.repository.ProfessionalSearchRepository;
 import com.mindzone.repository.UserRepository;
-import com.mindzone.service.impl.UserService;
+import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,6 +19,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 import static com.mindzone.exception.ExceptionMessages.*;
 
@@ -26,8 +28,8 @@ import static com.mindzone.exception.ExceptionMessages.*;
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
-    private UltimateModelMapper m;
     private ProfessionalSearchRepository search;
+    private UltimateModelMapper m;
 
     private void save(User user) {
         user.setUpdatedAt(new Date());
@@ -39,7 +41,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ApiRequestException(USER_NOT_FOUND));
     }
 
-    private User getById(String id) {
+    public User getById(String id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ApiRequestException(USER_NOT_FOUND));
     }
@@ -87,8 +89,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable("user")
-    public Page<User> search(SearchFilter filter) {
+//    @Cacheable("user") FIXME
+    public Page<ListedProfessional> search(SearchFilter filter) {
         return search.search(filter);
     }
 }

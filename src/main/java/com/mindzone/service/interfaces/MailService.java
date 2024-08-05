@@ -1,4 +1,4 @@
-package com.mindzone.service.impl;
+package com.mindzone.service.interfaces;
 
 public interface MailService {
 

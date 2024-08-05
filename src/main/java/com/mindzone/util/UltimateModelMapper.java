@@ -6,13 +6,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
 public class UltimateModelMapper {
 
-    private ModelMapper m;
+    private ModelMapper m = new ModelMapper();
 
     public <E, T> E map(T source, Class<E> typeDestination) {
         E model = null;
@@ -22,9 +24,10 @@ public class UltimateModelMapper {
         return model;
     }
 
-    public <E, T> List<E> mapToList(T sourceList, Class<E> listedTypeDestination) {
-        Type listType = TypeToken.getParameterized(List.class, listedTypeDestination).getType();
-        return m.map(sourceList, listType);
+    public <S, T> List<T> mapToList(List<S> sourceList, Class<T> targetClass) {
+        return sourceList.stream()
+                .map(element -> m.map(element, targetClass))
+                .collect(Collectors.toList());
     }
 
 }
