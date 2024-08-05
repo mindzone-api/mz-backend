@@ -1,21 +1,18 @@
 package com.mindzone.service.impl;
 
+import com.mindzone.dto.request.TherapyRequest;
+import com.mindzone.dto.request.TherapyResponse;
 import com.mindzone.dto.response.ListedProfessional;
-import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import com.mindzone.repository.TherapyRepository;
-import com.mindzone.repository.UserRepository;
 import com.mindzone.service.interfaces.PatientService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.mindzone.exception.ExceptionMessages.PROFESSIONAL_NOT_FOUND;
 
 @AllArgsConstructor
 @Service
@@ -33,5 +30,12 @@ public class PatientServiceImpl implements PatientService {
                 professionals.add(userService.getById(therapy.getProfessionalId()))
         );
         return m.mapToList(professionals, ListedProfessional.class);
+    }
+
+    @Override
+    public TherapyResponse requestTherapy(TherapyRequest therapyRequest) {
+        Therapy therapy = m.map(therapyRequest, Therapy.class);
+        therapyRepository.save(therapy);
+        return m.map(therapy, TherapyResponse.class);
     }
 }

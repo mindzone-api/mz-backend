@@ -26,7 +26,7 @@ public class Therapy extends AbstractModel implements Serializable {
     private TherapyStatus therapyStatus;
     private String url;
     private Boolean active;
-    private WeekDaySchedule schedule;
+    private List<WeekDaySchedule> schedule;
     private WeekDaySchedule nextSession;
     private List<Session> completedSessions;
 }

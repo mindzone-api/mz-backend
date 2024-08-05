@@ -1,6 +1,8 @@
 package com.mindzone.controller;
 
+import com.mindzone.dto.request.TherapyRequest;
 import com.mindzone.dto.request.SearchFilter;
+import com.mindzone.dto.request.TherapyResponse;
 import com.mindzone.dto.response.ListedProfessional;
 import com.mindzone.enums.Role;
 import com.mindzone.model.user.User;
@@ -10,10 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,6 +30,12 @@ public class PatientController {
     public ResponseEntity<Page<ListedProfessional>> search(JwtAuthenticationToken token, @RequestBody SearchFilter filter) {
         userService.validateUser(token);
         return ResponseEntity.ok(userService.search(filter));
+    }
+
+    @PostMapping("/ask-for-therapy")
+    public ResponseEntity<TherapyResponse> requestTherapy(JwtAuthenticationToken token, @RequestBody TherapyRequest therapyRequest) {
+        userService.validateUser(token, Role.PATIENT);
+        return ResponseEntity.ok(patientService.requestTherapy(therapyRequest));
     }
 
     @GetMapping("/my-professionals")
