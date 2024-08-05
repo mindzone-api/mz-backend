@@ -2,7 +2,7 @@ package com.mindzone.controller;
 
 import com.mindzone.dto.request.TherapyRequest;
 import com.mindzone.dto.request.SearchFilter;
-import com.mindzone.dto.request.TherapyResponse;
+import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.dto.response.ListedProfessional;
 import com.mindzone.enums.Role;
 import com.mindzone.model.user.User;
@@ -32,7 +32,7 @@ public class PatientController {
         return ResponseEntity.ok(userService.search(filter));
     }
 
-    @PostMapping("/ask-for-therapy")
+    @PostMapping("/request-therapy")
     public ResponseEntity<TherapyResponse> requestTherapy(JwtAuthenticationToken token, @RequestBody TherapyRequest therapyRequest) {
         User user = userService.validateUser(token, Role.PATIENT);
         return ResponseEntity.ok(patientService.requestTherapy(therapyRequest, user.getId()));

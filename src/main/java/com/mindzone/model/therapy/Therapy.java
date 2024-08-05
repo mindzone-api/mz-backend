@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -22,6 +23,7 @@ public class Therapy extends AbstractModel implements Serializable {
 
     private String patientId;
     private String professionalId;
+    private Date since;
     private TherapyModality therapyModality;
     private TherapyStatus therapyStatus;
     private String url;

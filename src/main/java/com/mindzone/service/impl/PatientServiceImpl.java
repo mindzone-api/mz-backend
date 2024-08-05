@@ -1,8 +1,9 @@
 package com.mindzone.service.impl;
 
 import com.mindzone.dto.request.TherapyRequest;
-import com.mindzone.dto.request.TherapyResponse;
+import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.dto.response.ListedProfessional;
+import com.mindzone.enums.TherapyStatus;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import com.mindzone.repository.TherapyRepository;
@@ -24,7 +25,7 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public List<ListedProfessional> getMyProfessionals(User user) {
-        List<Therapy> therapies = therapyRepository.findAllByPatientId(user.getId());
+        List<Therapy> therapies = therapyRepository.findAllByPatientIdAndTherapyStatus(user.getId(), TherapyStatus.APPROVED);
         List<User> professionals = new ArrayList<>();
         therapies.forEach(therapy ->
                 professionals.add(userService.getById(therapy.getProfessionalId()))
@@ -32,10 +33,11 @@ public class PatientServiceImpl implements PatientService {
         return m.mapToList(professionals, ListedProfessional.class);
     }
 
-    @Override
+    @Override // FIXME this feature still needs to be done properly
     public TherapyResponse requestTherapy(TherapyRequest therapyRequest, String userId) {
         Therapy therapy = m.map(therapyRequest, Therapy.class);
         therapy.setPatientId(userId);
+        therapy.setTherapyStatus(TherapyStatus.PENDING);
         therapyRepository.save(therapy);
         return m.map(therapy, TherapyResponse.class);
     }
