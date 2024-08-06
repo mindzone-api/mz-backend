@@ -7,7 +7,7 @@ import com.mindzone.dto.response.UserResponse;
 import com.mindzone.enums.Role;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.user.User;
-import com.mindzone.repository.ProfessionalSearchRepository;
+import com.mindzone.repository.professionalSearch.ProfessionalSearchRepository;
 import com.mindzone.repository.UserRepository;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;

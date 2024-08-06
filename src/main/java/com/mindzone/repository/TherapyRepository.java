@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface TherapyRepository extends MongoRepository<Therapy, String> {
 
     List<Therapy> findAllByPatientIdAndTherapyStatus(String patientId, TherapyStatus status);
+    List<Therapy> findAllByProfessionalIdAndTherapyStatus(String professionalId, TherapyStatus status);
 
 }

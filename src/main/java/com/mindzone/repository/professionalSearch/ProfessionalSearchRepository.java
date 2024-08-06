@@ -1,4 +1,4 @@
-package com.mindzone.repository;
+package com.mindzone.repository.professionalSearch;
 
 import com.mindzone.dto.request.SearchFilter;
 import com.mindzone.dto.response.ListedProfessional;
