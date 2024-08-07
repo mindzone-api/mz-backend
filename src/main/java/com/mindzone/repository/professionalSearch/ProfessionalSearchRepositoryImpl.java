@@ -1,7 +1,7 @@
 package com.mindzone.repository.professionalSearch;
 
 import com.mindzone.dto.request.SearchFilter;
-import com.mindzone.dto.response.ListedProfessional;
+import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.model.user.User;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;

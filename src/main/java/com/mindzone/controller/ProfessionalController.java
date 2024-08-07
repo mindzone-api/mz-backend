@@ -1,6 +1,7 @@
 package com.mindzone.controller;
 
-import com.mindzone.dto.response.ListedPatient;
+import com.mindzone.dto.response.listed.ListedPatient;
+import com.mindzone.dto.response.listed.ListedAlly;
 import com.mindzone.enums.Role;
 import com.mindzone.model.user.User;
 import com.mindzone.service.interfaces.ProfessionalService;
@@ -28,6 +29,12 @@ public class ProfessionalController {
     public ResponseEntity<List<ListedPatient>> getMyPatients(JwtAuthenticationToken token) {
         User user = userService.validateUser(token, Role.PROFESSIONAL);
         return ResponseEntity.ok(professionalService.getMyPatients(user));
+    }
+
+    @GetMapping("/my-allies")
+    public ResponseEntity<List<ListedAlly>> getMyAllies(JwtAuthenticationToken token) {
+        User user = userService.validateUser(token, Role.PROFESSIONAL);
+        return ResponseEntity.ok(professionalService.getMyAllies(user));
     }
 
 }

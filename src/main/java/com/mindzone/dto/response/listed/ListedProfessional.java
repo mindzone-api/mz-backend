@@ -1,4 +1,4 @@
-package com.mindzone.dto.response;
+package com.mindzone.dto.response.listed;
 
 import com.mindzone.enums.Profession;
 import com.mindzone.enums.TherapyModality;
@@ -20,4 +20,5 @@ public class ListedProfessional implements Serializable {
     private Profession profession;
     private List<TherapyModality> therapyModalities;
     private BigDecimal pricePerSession;
+    private Boolean active;
 }
