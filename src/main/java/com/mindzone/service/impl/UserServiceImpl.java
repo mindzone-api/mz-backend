@@ -2,7 +2,7 @@ package com.mindzone.service.impl;
 
 import com.mindzone.dto.request.SearchFilter;
 import com.mindzone.dto.request.SignUpRequest;
-import com.mindzone.dto.response.ListedProfessional;
+import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.enums.Role;
 import com.mindzone.exception.ApiRequestException;
