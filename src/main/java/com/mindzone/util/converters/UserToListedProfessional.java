@@ -1,6 +1,6 @@
 package com.mindzone.util.converters;
 
-import com.mindzone.dto.response.ListedProfessional;
+import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.model.user.User;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;
