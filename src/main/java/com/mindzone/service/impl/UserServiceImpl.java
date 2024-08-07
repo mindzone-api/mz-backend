@@ -1,7 +1,7 @@
 package com.mindzone.service.impl;
 
 import com.mindzone.dto.request.SearchFilter;
-import com.mindzone.dto.request.SignUpRequest;
+import com.mindzone.dto.request.UserRequest;
 import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.enums.Role;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+import static com.mindzone.constants.Constants.EMPTY;
 import static com.mindzone.exception.ExceptionMessages.*;
 
 @Service
@@ -44,6 +45,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse update(String id, UserRequest userRequest) {
+        User user = getById(id);
+        if (
+                user.getRole() == Role.PATIENT && userRequest.getProfessionalInfo() != EMPTY ||
+                user.getRole() == Role.PROFESSIONAL && userRequest.getProfessionalInfo() == EMPTY
+        ) {
+            throw new ApiRequestException(UNABLE_TO_SWITCH_ROLES);
+        }
+        m.map(userRequest, user);
+        save(user);
+        return m.map(user, UserResponse.class);
+    }
+
+    @Override
     public UserResponse get(String id) {
         User user = getById(id);
         return m.map(user, UserResponse.class);
@@ -64,7 +79,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse signUp(SignUpRequest request) {
+    public UserResponse signUp(UserRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new ApiRequestException(USER_ALREADY_EXISTS);
         }
@@ -78,7 +93,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = m.map(request, User.class);
-        user.setRole(user.getProfessionalInfo() == null ? Role.PATIENT : Role.PROFESSIONAL);
+        user.setRole(user.getProfessionalInfo() == EMPTY ? Role.PATIENT : Role.PROFESSIONAL);
         user.setCreatedAt(new Date());
         // TODO stripe integration
         save(user);

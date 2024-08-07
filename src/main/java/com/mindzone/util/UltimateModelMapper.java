@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UltimateModelMapper {
 
-    private ModelMapper m = new ModelMapper();
+    private ModelMapper m;
 
     public <E, T> E map(T source, Class<E> typeDestination) {
         E model = null;
@@ -22,6 +22,10 @@ public class UltimateModelMapper {
             model = m.map(source, typeDestination);
         }
         return model;
+    }
+
+    public void map(Object source, Object destination) {
+        m.map(source, destination);
     }
 
     public <S, T> List<T> mapToList(List<S> sourceList, Class<T> targetClass) {

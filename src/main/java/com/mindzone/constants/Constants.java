@@ -1,5 +1,7 @@
 package com.mindzone.constants;
 
+import com.mindzone.model.user.ProfessionalInfo;
+
 public class Constants {
 
     // --------------- CURRENT VERSION --------------- \\
@@ -28,5 +30,9 @@ public class Constants {
             "/webjars/**",
             "/swagger-ui.html"
     };
+
+    // --------------- ROLES --------------- \\
+
+    public static final ProfessionalInfo EMPTY = null;
 
 }

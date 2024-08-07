@@ -1,7 +1,6 @@
 package com.mindzone.dto.request;
 
 import com.mindzone.enums.Gender;
-import com.mindzone.enums.Role;
 import com.mindzone.enums.State;
 import com.mindzone.model.user.ProfessionalInfo;
 import lombok.AllArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class SignUpRequest {
+public class UserRequest {
     private String name;
     private String email;
     private String profilePictureURL;

@@ -1,7 +1,7 @@
 package com.mindzone.service.interfaces;
 
 import com.mindzone.dto.request.SearchFilter;
-import com.mindzone.dto.request.SignUpRequest;
+import com.mindzone.dto.request.UserRequest;
 import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.enums.Role;
@@ -15,11 +15,13 @@ public interface UserService {
 
     User validateUser(JwtAuthenticationToken token, Role role);
 
-    UserResponse signUp(SignUpRequest signUpRequest);
+    UserResponse signUp(UserRequest userRequest);
 
     UserResponse get(String id);
 
     Page<ListedProfessional> search(SearchFilter filter);
 
     User getById(String id);
+
+    UserResponse update(String id, UserRequest userRequest);
 }
