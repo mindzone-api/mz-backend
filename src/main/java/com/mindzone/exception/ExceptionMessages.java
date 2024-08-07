@@ -11,6 +11,7 @@ public class ExceptionMessages {
     public static final String PROFESSIONAL_CODE_ALREADY_EXISTS = "PROFESSIONAL_CODE_ALREADY_EXISTS";
 
     public static final String UNABLE_TO_SWITCH_ROLES = "UNABLE_TO_SWITCH_ROLES";
+    public static final String UNABLE_TO_SWITCH_EMAIL_ADDRESS = "UNABLE_TO_SWITCH_EMAIL_ADDRESS";
 
     // --------------- PROFESSIONAL --------------- \\
 

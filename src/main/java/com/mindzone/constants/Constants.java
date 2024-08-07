@@ -18,6 +18,7 @@ public class Constants {
     public static final String CLIENT_SECRET = System.getenv("GOOGLE_CLIENT_SECRET");
     public static final String[] WHITELIST_ENDPOINTS = {
             V1 + "/user/signup",
+            V1 + "/payment",
             "/error",
             "/v2/api-docs",
             "/v3/api-docs",
@@ -34,5 +35,9 @@ public class Constants {
     // --------------- ROLES --------------- \\
 
     public static final ProfessionalInfo EMPTY = null;
+
+    // --------------- PAYMENTS --------------- \\
+
+    public static final String STRIPE_API_KEY = System.getenv("STRIPE_API_KEY");
 
 }

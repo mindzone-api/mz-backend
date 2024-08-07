@@ -34,11 +34,6 @@ public class UserServiceImpl implements UserService {
         this.userRepository.save(user);
     }
 
-    private User getByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiRequestException(USER_NOT_FOUND));
-    }
-
     public User getById(String id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ApiRequestException(USER_NOT_FOUND));
@@ -52,6 +47,9 @@ public class UserServiceImpl implements UserService {
                 user.getRole() == Role.PROFESSIONAL && userRequest.getProfessionalInfo() == EMPTY
         ) {
             throw new ApiRequestException(UNABLE_TO_SWITCH_ROLES);
+        }
+        if (!user.getEmail().equals(userRequest.getEmail())) {
+            throw new ApiRequestException(UNABLE_TO_SWITCH_EMAIL_ADDRESS);
         }
         m.map(userRequest, user);
         save(user);
