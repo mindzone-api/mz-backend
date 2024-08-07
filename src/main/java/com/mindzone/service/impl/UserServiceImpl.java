@@ -1,7 +1,7 @@
 package com.mindzone.service.impl;
 
 import com.mindzone.dto.request.SearchFilter;
-import com.mindzone.dto.request.SignUpRequest;
+import com.mindzone.dto.request.UserRequest;
 import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.enums.Role;
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse signUp(SignUpRequest request) {
+    public UserResponse signUp(UserRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new ApiRequestException(USER_ALREADY_EXISTS);
         }

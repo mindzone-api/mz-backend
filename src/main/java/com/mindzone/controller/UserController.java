@@ -1,7 +1,7 @@
 package com.mindzone.controller;
 
 
-import com.mindzone.dto.request.SignUpRequest;
+import com.mindzone.dto.request.UserRequest;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.service.interfaces.UserService;
 import lombok.AllArgsConstructor;
@@ -20,8 +20,8 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
-        return new ResponseEntity<>(userService.signUp(signUpRequest), HttpStatus.CREATED);
+    public ResponseEntity<UserResponse> signUp(@RequestBody UserRequest userRequest) {
+        return new ResponseEntity<>(userService.signUp(userRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
