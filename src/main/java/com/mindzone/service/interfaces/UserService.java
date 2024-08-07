@@ -22,4 +22,6 @@ public interface UserService {
     Page<ListedProfessional> search(SearchFilter filter);
 
     User getById(String id);
+
+    UserResponse update(String id, UserRequest userRequest);
 }
