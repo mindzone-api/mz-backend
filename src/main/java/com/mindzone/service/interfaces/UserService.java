@@ -23,5 +23,7 @@ public interface UserService {
 
     User getById(String id);
 
+    void save(User user);
+
     UserResponse update(String id, UserRequest userRequest);
 }

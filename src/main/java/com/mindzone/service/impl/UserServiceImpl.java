@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     private ProfessionalSearchRepository search;
     private UltimateModelMapper m;
 
-    private void save(User user) {
+    public void save(User user) {
         user.setUpdatedAt(new Date());
         this.userRepository.save(user);
     }
