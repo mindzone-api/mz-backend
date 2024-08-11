@@ -1,9 +1,11 @@
 package com.mindzone.service.impl;
 
+import com.mindzone.dto.response.UserResponse;
 import com.mindzone.dto.response.listed.ListedPatient;
 import com.mindzone.enums.TherapyStatus;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
+import com.mindzone.model.user.WeekDaySchedule;
 import com.mindzone.repository.TherapyRepository;
 import com.mindzone.service.interfaces.ProfessionalService;
 import com.mindzone.service.interfaces.UserService;
@@ -52,5 +54,12 @@ public class ProfessionalServiceImpl implements ProfessionalService {
             }
         }
         return allies;
+    }
+
+    @Override
+    public UserResponse updateAvailability(User user, List<WeekDaySchedule> schedule) {
+        user.getProfessionalInfo().setAvailability(schedule);
+        userService.save(user);
+        return m.map(user, UserResponse.class);
     }
 }

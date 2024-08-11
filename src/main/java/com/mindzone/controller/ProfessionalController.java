@@ -1,17 +1,17 @@
 package com.mindzone.controller;
 
+import com.mindzone.dto.response.UserResponse;
 import com.mindzone.dto.response.listed.ListedPatient;
 import com.mindzone.dto.response.listed.ListedAlly;
 import com.mindzone.enums.Role;
 import com.mindzone.model.user.User;
+import com.mindzone.model.user.WeekDaySchedule;
 import com.mindzone.service.interfaces.ProfessionalService;
 import com.mindzone.service.interfaces.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,6 +35,12 @@ public class ProfessionalController {
     public ResponseEntity<List<ListedAlly>> getMyAllies(JwtAuthenticationToken token) {
         User user = userService.validateUser(token, Role.PROFESSIONAL);
         return ResponseEntity.ok(professionalService.getMyAllies(user));
+    }
+
+    @PutMapping("/schedule")
+    public ResponseEntity<UserResponse> updateAvailability(JwtAuthenticationToken token, @RequestBody List<WeekDaySchedule> schedule) {
+        User user = userService.validateUser(token, Role.PROFESSIONAL);
+        return ResponseEntity.ok(professionalService.updateAvailability(user, schedule));
     }
 
 }
