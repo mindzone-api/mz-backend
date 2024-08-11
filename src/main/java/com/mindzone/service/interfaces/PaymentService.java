@@ -4,11 +4,7 @@ import com.mindzone.dto.request.StripeClientRequest;
 import com.stripe.exception.StripeException;
 
 public interface PaymentService {
-    void createCustomer(StripeClientRequest stripeClientRequest) throws StripeException;
+    String createSubscription(String customerId) throws StripeException;
 
-    void updateCustomer(StripeClientRequest s);
-
-    String createSubscription(String customerId);
-
-    void cancelSubscription(String subscriptionId);
+    String createSession() throws StripeException;
 }

@@ -18,7 +18,7 @@ public class Constants {
     public static final String CLIENT_SECRET = System.getenv("GOOGLE_CLIENT_SECRET");
     public static final String[] WHITELIST_ENDPOINTS = {
             V1 + "/user/signup",
-            V1 + "/payment",
+            V1 + "/payment/**",
             "/error",
             "/v2/api-docs",
             "/v3/api-docs",
@@ -39,5 +39,13 @@ public class Constants {
     // --------------- PAYMENTS --------------- \\
 
     public static final String STRIPE_API_KEY = System.getenv("STRIPE_API_KEY");
+
+    public static final String PRODUCT_ID = "prod_QcskfCJukFCWBw";
+
+    public static final String PRICE_ID = "price_1PlcyuGYTtTKNlX9iuNZtSPC";
+
+    public static final String SUCCESSFUL_PAYMENT_URL = "localhost:8080/api/v1/payment/success";
+
+    public static final String FAILED_PAYMENT_URL = "localhost:8080/api/v1/payment/failure";
 
 }
