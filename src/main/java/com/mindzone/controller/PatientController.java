@@ -26,18 +26,6 @@ public class PatientController {
     private UserService userService;
     private PatientService patientService;
 
-    @GetMapping("/search")
-    public ResponseEntity<Page<ListedProfessional>> search(JwtAuthenticationToken token, @RequestBody SearchFilter filter) {
-        userService.validateUser(token);
-        return ResponseEntity.ok(userService.search(filter));
-    }
-
-    @PostMapping("/request-therapy")
-    public ResponseEntity<TherapyResponse> requestTherapy(JwtAuthenticationToken token, @RequestBody TherapyRequest therapyRequest) {
-        User user = userService.validateUser(token, Role.PATIENT);
-        return ResponseEntity.ok(patientService.requestTherapy(therapyRequest, user.getId()));
-    }
-
     @GetMapping("/my-professionals")
     public ResponseEntity<List<ListedProfessional>> getMyProfessionals(JwtAuthenticationToken token) {
         User user = userService.validateUser(token, Role.PATIENT);

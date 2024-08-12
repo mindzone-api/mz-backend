@@ -37,4 +37,10 @@ public class UserController {
         return ResponseEntity.ok(userService.update(user.getId(), userRequest));
     }
 
+    @GetMapping
+    public ResponseEntity<UserResponse> whoAmI(JwtAuthenticationToken token) {
+        User user = userService.validateUser(token);
+        return ResponseEntity.ok(userService.whoAmI(user));
+    }
+
 }
