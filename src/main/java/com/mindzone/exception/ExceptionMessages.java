@@ -13,9 +13,13 @@ public class ExceptionMessages {
     public static final String UNABLE_TO_SWITCH_ROLES = "UNABLE_TO_SWITCH_ROLES";
     public static final String UNABLE_TO_SWITCH_EMAIL_ADDRESS = "UNABLE_TO_SWITCH_EMAIL_ADDRESS";
 
-    // --------------- PROFESSIONAL --------------- \\
+    // --------------- THERAPY --------------- \\
 
-    public static final String PROFESSIONAL_NOT_FOUND = "PROFESSIONAL_NOT_FOUND";
+    public static final String PATIENT_IS_ALREADY_IN_THERAPY_WITH_THIS_PROFESSION = "PATIENT_IS_ALREADY_IN_THERAPY_WITH_THIS_PROFESSION";
+    public static final String THERAPY_MODALITY_NOT_ACCEPTED = "THERAPY_MODALITY_NOT_ACCEPTED";
+    public static final String INVALID_THERAPY_SCHEDULE = "INVALID_THERAPY_SCHEDULE";
+    public static final String INVALID_SESSION_DURATION_REQUEST = "INVALID_SESSION_DURATION_REQUEST";
+    public static final String THERAPY_TIME_CONFLICT = "THERAPY_TIME_CONFLICT";
 
     // --------------- SESSIONS --------------- \\
 
