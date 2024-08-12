@@ -26,4 +26,6 @@ public interface UserService {
     void save(User user);
 
     UserResponse update(String id, UserRequest userRequest);
+
+    UserResponse whoAmI(User user);
 }

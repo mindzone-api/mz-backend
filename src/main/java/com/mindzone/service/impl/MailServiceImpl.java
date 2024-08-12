@@ -12,12 +12,7 @@ public class MailServiceImpl implements MailService {
 
     private MailProducer producer;
 
-    public String sendMail() {
-        producer.send(new MailDTO(
-                "sousa0240@gmail.com",
-                "teste de email",
-                "corpo do teste"
-        ));
-        return "deu certo";
+    public void sendMail(MailDTO mail) {
+        producer.send(mail);
     }
 }

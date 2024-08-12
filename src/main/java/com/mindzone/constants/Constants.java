@@ -4,8 +4,9 @@ import com.mindzone.model.user.ProfessionalInfo;
 
 public class Constants {
 
-    // --------------- CURRENT VERSION --------------- \\
+    // --------------- DOMAIN --------------- \\
     public static final String V1 = "/api/v1";
+    public static final String MINDZONE_HOMEPAGE = "localhost:8080" + V1 + "/home";
 
     // --------------- RABBIT MQ --------------- \\
     public static final String RABBIT_MAIL_QUEUE = "mz.mail";

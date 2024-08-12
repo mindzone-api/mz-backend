@@ -57,6 +57,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse whoAmI(User user) {
+        return m.map(user, UserResponse.class);
+    }
+
+    @Override
     public UserResponse get(String id) {
         User user = getById(id);
         return m.map(user, UserResponse.class);
