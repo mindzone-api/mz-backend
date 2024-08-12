@@ -9,6 +9,4 @@ import java.util.List;
 
 public interface PatientService {
     List<ListedProfessional> getMyProfessionals(User user);
-
-    TherapyResponse requestTherapy(TherapyRequest therapyRequest, String userId);
 }
