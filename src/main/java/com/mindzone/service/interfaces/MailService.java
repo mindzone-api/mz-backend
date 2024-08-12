@@ -1,7 +1,9 @@
 package com.mindzone.service.interfaces;
 
+import com.mindzone.dto.MailDTO;
+
 public interface MailService {
 
-    String sendMail();
+    void sendMail(MailDTO mail);
 
 }
