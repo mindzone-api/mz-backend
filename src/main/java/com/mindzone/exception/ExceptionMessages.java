@@ -20,6 +20,7 @@ public class ExceptionMessages {
     public static final String INVALID_THERAPY_SCHEDULE = "INVALID_THERAPY_SCHEDULE";
     public static final String INVALID_SESSION_DURATION_REQUEST = "INVALID_SESSION_DURATION_REQUEST";
     public static final String THERAPY_TIME_CONFLICT = "THERAPY_TIME_CONFLICT";
+    public static final String THERAPY_NOT_FOUND = "THERAPY_NOT_FOUND";
 
     // --------------- SESSIONS --------------- \\
 
