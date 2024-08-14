@@ -104,7 +104,7 @@ public class TherapyServiceImpl implements TherapyService {
               throw new ApiRequestException(USER_UNAUTHORIZED);
           }
         } else if (user.getRole() == Role.PROFESSIONAL) {
-            List<Therapy> patientTherapies = therapyRepository.findAllByPatientId(user.getId());
+            List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndTherapyStatus(therapy.getPatientId(), TherapyStatus.APPROVED);
             List<Therapy> patientTherapiesWithLoggedProfessional = patientTherapies.stream().filter(t -> t.getProfessionalId().equals(user.getId())).toList();
             if (patientTherapiesWithLoggedProfessional.isEmpty()) {
                 throw new ApiRequestException(USER_UNAUTHORIZED);

@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 public class TherapyResponse {
 
+    private String id;
     private String patientId;
     private String professionalId;
     private TherapyStatus therapyStatus;
