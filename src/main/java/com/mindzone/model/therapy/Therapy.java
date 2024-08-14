@@ -1,5 +1,7 @@
 package com.mindzone.model.therapy;
 
+import com.mindzone.enums.HealthPlan;
+import com.mindzone.enums.PaymentMethod;
 import com.mindzone.enums.TherapyModality;
 import com.mindzone.enums.TherapyStatus;
 import com.mindzone.model.AbstractModel;
@@ -28,6 +30,8 @@ public class Therapy extends AbstractModel implements Serializable {
     private TherapyStatus therapyStatus;
     private String url;
     private Boolean active;
+    private PaymentMethod paymentMethod;
+    private HealthPlan healthPlan;
     private List<WeekDaySchedule> schedule;
     private WeekDaySchedule nextSession;
     private List<Session> completedSessions;
