@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.mindzone.constants.MailsBody.therapyRequestMail;
@@ -35,6 +36,11 @@ public class TherapyServiceImpl implements TherapyService {
     private UserService userService;
     private MailService mailService;
     private UltimateModelMapper m;
+
+    private void save(Therapy therapy) {
+        therapy.setUpdatedAt(new Date());
+        therapyRepository.save(therapy);
+    }
 
     @Override
     public TherapyResponse requestTherapy(TherapyRequest therapyRequest, User user) {
@@ -82,7 +88,7 @@ public class TherapyServiceImpl implements TherapyService {
         therapy.setPatientId(user.getId());
         therapy.setTherapyStatus(TherapyStatus.PENDING);
         therapy.setCompletedSessions(new ArrayList<>());
-        therapyRepository.save(therapy);
+        save(therapy);
 
         // notify requested professional
         mailService.sendMail(therapyRequestMail(
@@ -96,11 +102,15 @@ public class TherapyServiceImpl implements TherapyService {
     @Override
     public TherapyResponse get(User user, String id) {
         Therapy therapy = getById(id);
+        validateTherapyaccess(user, therapy);
+        return m.map(therapy, TherapyResponse.class);
+    }
 
+    private void validateTherapyaccess(User user, Therapy therapy) {
         if (user.getRole() == Role.PATIENT) {
-          if (!therapy.getPatientId().equals(user.getId())) {
-              throw new ApiRequestException(USER_UNAUTHORIZED);
-          }
+            if (!therapy.getPatientId().equals(user.getId())) {
+                throw new ApiRequestException(USER_UNAUTHORIZED);
+            }
         } else if (user.getRole() == Role.PROFESSIONAL) {
             List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndTherapyStatus(therapy.getPatientId(), TherapyStatus.APPROVED);
             List<Therapy> patientTherapiesWithLoggedProfessional = patientTherapies.stream().filter(t -> t.getProfessionalId().equals(user.getId())).toList();
@@ -108,7 +118,6 @@ public class TherapyServiceImpl implements TherapyService {
                 throw new ApiRequestException(USER_UNAUTHORIZED);
             }
         }
-        return m.map(therapy, TherapyResponse.class);
     }
 
     @Override
@@ -118,6 +127,18 @@ public class TherapyServiceImpl implements TherapyService {
                         m.mapToList(therapyRepository.findAllByPatientId(user.getId()), ListedTherapy.class) :
                         m.mapToList(therapyRepository.findAllByProfessionalId(user.getId()), ListedTherapy.class)
         );
+    }
+
+    @Override
+    public TherapyResponse updateRequest(User user, String therapyId, TherapyRequest therapyRequest) {
+        Therapy therapy = getById(therapyId);
+        validateTherapyaccess(user, therapy);
+        if (therapy.getTherapyStatus() != TherapyStatus.PENDING) {
+            throw new ApiRequestException(THERAPY_IS_NOT_EDITABLE_ANYMORE);
+        }
+        m.map(therapyRequest, therapy);
+        save(therapy);
+        return m.map(therapy, TherapyResponse.class);
     }
 
     private Therapy getById(String id) {
