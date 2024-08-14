@@ -12,4 +12,5 @@ public interface TherapyRepository extends MongoRepository<Therapy, String> {
     List<Therapy> findAllByPatientIdAndTherapyStatus(String patientId, TherapyStatus status);
     List<Therapy> findAllByProfessionalIdAndTherapyStatus(String professionalId, TherapyStatus status);
 
+    List<Therapy> findAllByPatientId(String id);
 }

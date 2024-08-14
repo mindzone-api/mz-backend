@@ -2,6 +2,7 @@ package com.mindzone.service.impl;
 
 import com.mindzone.dto.request.TherapyRequest;
 import com.mindzone.dto.response.TherapyResponse;
+import com.mindzone.enums.Role;
 import com.mindzone.enums.TherapyStatus;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.therapy.Therapy;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mindzone.constants.MailsBody.therapyRequestMail;
 import static com.mindzone.exception.ExceptionMessages.*;
@@ -91,5 +93,28 @@ public class TherapyServiceImpl implements TherapyService {
         ));
 
         return m.map(therapy, TherapyResponse.class);
+    }
+
+    @Override
+    public TherapyResponse get(User user, String id) {
+        Therapy therapy = getById(id);
+
+        if (user.getRole() == Role.PATIENT) {
+          if (!therapy.getPatientId().equals(user.getId())) {
+              throw new ApiRequestException(USER_UNAUTHORIZED);
+          }
+        } else if (user.getRole() == Role.PROFESSIONAL) {
+            List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndTherapyStatus(therapy.getPatientId(), TherapyStatus.APPROVED);
+            List<Therapy> patientTherapiesWithLoggedProfessional = patientTherapies.stream().filter(t -> t.getProfessionalId().equals(user.getId())).toList();
+            if (patientTherapiesWithLoggedProfessional.isEmpty()) {
+                throw new ApiRequestException(USER_UNAUTHORIZED);
+            }
+        }
+        return m.map(therapy, TherapyResponse.class);
+    }
+
+    private Therapy getById(String id) {
+        return therapyRepository.findById(id)
+                .orElseThrow(() -> new ApiRequestException(THERAPY_NOT_FOUND));
     }
 }

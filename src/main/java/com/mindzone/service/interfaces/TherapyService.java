@@ -7,4 +7,6 @@ import com.mindzone.model.user.User;
 public interface TherapyService {
 
     TherapyResponse requestTherapy(TherapyRequest therapyRequest, User user);
+
+    TherapyResponse get(User user, String id);
 }
