@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class ListedPatient {
 
+    private String id;
     private String name;
     private String profilePictureURL;
     private Boolean active;

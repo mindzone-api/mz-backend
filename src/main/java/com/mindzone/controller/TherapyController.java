@@ -2,6 +2,7 @@ package com.mindzone.controller;
 
 import com.mindzone.dto.request.TherapyRequest;
 import com.mindzone.dto.response.TherapyResponse;
+import com.mindzone.dto.response.listed.ListedTherapy;
 import com.mindzone.enums.Role;
 import com.mindzone.model.user.User;
 import com.mindzone.service.interfaces.TherapyService;
@@ -10,6 +11,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.mindzone.constants.Constants.V1;
 
@@ -32,4 +35,12 @@ public class TherapyController {
         User user = userService.validateUser(token);
         return ResponseEntity.ok(therapyService.get(user, id));
     }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<List<ListedTherapy>> getAll(JwtAuthenticationToken token) {
+        User user = userService.validateUser(token);
+        return ResponseEntity.ok(therapyService.getAll(user));
+    }
+
+
 }

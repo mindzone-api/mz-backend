@@ -1,18 +1,18 @@
 package com.mindzone.dto.response.listed;
 
-import com.mindzone.enums.*;
+import com.mindzone.enums.TherapyStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class ListedAlly {
+public class ListedTherapy {
 
     private String id;
-    private String name;
-    private String profilePictureURL;
     private String patientId;
-    private Boolean active;
+    private String professionalId;
+    private TherapyStatus therapyStatus;
+    private boolean active;
 }
