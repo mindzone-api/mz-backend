@@ -1,6 +1,5 @@
 package com.mindzone.service.impl;
 
-import com.mindzone.dto.request.StripeClientRequest;
 import com.mindzone.service.interfaces.PaymentService;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;

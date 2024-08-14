@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 
 import static com.mindzone.constants.Constants.EMPTY;
+import static com.mindzone.enums.Role.PATIENT;
+import static com.mindzone.enums.Role.PROFESSIONAL;
 import static com.mindzone.exception.ExceptionMessages.*;
 
 @Service
@@ -43,8 +45,8 @@ public class UserServiceImpl implements UserService {
     public UserResponse update(String id, UserRequest userRequest) {
         User user = getById(id);
         if (
-                user.getRole() == Role.PATIENT && userRequest.getProfessionalInfo() != EMPTY ||
-                user.getRole() == Role.PROFESSIONAL && userRequest.getProfessionalInfo() == EMPTY
+                user.getRole() == PATIENT && userRequest.getProfessionalInfo() != EMPTY ||
+                user.getRole() == PROFESSIONAL && userRequest.getProfessionalInfo() == EMPTY
         ) {
             throw new ApiRequestException(UNABLE_TO_SWITCH_ROLES);
         }
@@ -96,7 +98,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = m.map(request, User.class);
-        user.setRole(user.getProfessionalInfo() == EMPTY ? Role.PATIENT : Role.PROFESSIONAL);
+        user.setRole(user.getProfessionalInfo() == EMPTY ? PATIENT : PROFESSIONAL);
         user.setCreatedAt(new Date());
         // TODO stripe integration
         save(user);
