@@ -42,5 +42,15 @@ public class TherapyController {
         return ResponseEntity.ok(therapyService.getAll(user));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<TherapyResponse> updateRequest(
+            JwtAuthenticationToken token,
+            @PathVariable String id,
+            @RequestBody TherapyRequest therapyRequest
+    ) {
+        User user = userService.validateUser(token, Role.PATIENT);
+        return ResponseEntity.ok(therapyService.updateRequest(user, id, therapyRequest));
+    }
+
 
 }

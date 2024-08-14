@@ -14,4 +14,6 @@ public interface TherapyService {
     TherapyResponse get(User user, String id);
 
     List<ListedTherapy> getAll(User user);
+
+    TherapyResponse updateRequest(User user, String id, TherapyRequest therapyRequest);
 }
