@@ -38,8 +38,6 @@ public class TherapyServiceImpl implements TherapyService {
 
     @Override
     public TherapyResponse requestTherapy(TherapyRequest therapyRequest, User user) {
-        // TODO cancelar request de terapia
-        // TODO listar minhas requests
         List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndTherapyStatus(user.getId(), TherapyStatus.APPROVED);
         User requestedProfessional = userService.getById(therapyRequest.getProfessionalId());
         ProfessionalInfo requestedProfessionalData = requestedProfessional.getProfessionalInfo();
