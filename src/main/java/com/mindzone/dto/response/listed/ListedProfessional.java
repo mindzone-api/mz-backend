@@ -15,6 +15,7 @@ import java.util.List;
 @Data
 public class ListedProfessional implements Serializable {
 
+    private String id;
     private String name;
     private String profilePictureURL;
     private Profession profession;

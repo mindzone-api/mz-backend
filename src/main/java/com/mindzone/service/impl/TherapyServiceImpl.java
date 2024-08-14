@@ -2,6 +2,7 @@ package com.mindzone.service.impl;
 
 import com.mindzone.dto.request.TherapyRequest;
 import com.mindzone.dto.response.TherapyResponse;
+import com.mindzone.dto.response.listed.ListedTherapy;
 import com.mindzone.enums.Role;
 import com.mindzone.enums.TherapyStatus;
 import com.mindzone.exception.ApiRequestException;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.mindzone.constants.MailsBody.therapyRequestMail;
 import static com.mindzone.exception.ExceptionMessages.*;
@@ -109,6 +109,15 @@ public class TherapyServiceImpl implements TherapyService {
             }
         }
         return m.map(therapy, TherapyResponse.class);
+    }
+
+    @Override
+    public List<ListedTherapy> getAll(User user) {
+        return (
+                user.getRole() == Role.PATIENT ?
+                        m.mapToList(therapyRepository.findAllByPatientId(user.getId()), ListedTherapy.class) :
+                        m.mapToList(therapyRepository.findAllByProfessionalId(user.getId()), ListedTherapy.class)
+        );
     }
 
     private Therapy getById(String id) {
