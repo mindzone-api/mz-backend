@@ -39,7 +39,7 @@ public class MailsBody {
         return new MailDTO(
                 patientMail,
                 professionalName + " denied your therapy request",
-                professionalName + " has denied your therapy request with the following" +
+                professionalName + " has denied your therapy request with the following " +
                         "justification:\n" + denialJustification
         );
     }

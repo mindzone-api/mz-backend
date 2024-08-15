@@ -4,6 +4,9 @@ import com.mindzone.dto.request.TherapyRequest;
 import com.mindzone.dto.request.TherapyRequestAnalysis;
 import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.dto.response.listed.ListedTherapy;
+import com.mindzone.enums.HealthPlan;
+import com.mindzone.enums.PaymentMethod;
+import com.mindzone.enums.TherapyModality;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.ProfessionalInfo;
@@ -25,6 +28,7 @@ import java.util.List;
 import static com.mindzone.constants.MailsBody.*;
 import static com.mindzone.enums.Role.PATIENT;
 import static com.mindzone.enums.Role.PROFESSIONAL;
+import static com.mindzone.enums.TherapyModality.ONLINE;
 import static com.mindzone.enums.TherapyStatus.*;
 import static com.mindzone.exception.ExceptionMessages.*;
 import static com.mindzone.util.WeekDayScheduleUtil.*;
@@ -40,13 +44,20 @@ public class TherapyServiceImpl implements TherapyService {
 
     @Override
     public TherapyResponse requestTherapy(TherapyRequest therapyRequest, User patient) {
+        // Checking if patient already has a valid request with this professional
+        // This check is not in the function below because it is also used on update therapy
+        for (Therapy t : therapyRepository.findAllByPatientIdAndProfessionalId(patient.getId(), therapyRequest.getProfessionalId())) {
+            if (t.getTherapyStatus() == APPROVED || t.getTherapyStatus() == PENDING) {
+                throw new ApiRequestException(THERAPY_ALREADY_EXISTS);
+            }
+        }
         checkTherapyRequestValidation(therapyRequest, patient);
 
         // initialize and save request
         Therapy therapy = m.map(therapyRequest, Therapy.class);
         therapy.setPatientId(patient.getId());
         therapy.setTherapyStatus(PENDING);
-        therapy.setCompletedSessions(new ArrayList<>());
+        therapy.setActive(false);
         therapy.setCreatedAt(new Date());
         save(therapy);
 
@@ -108,7 +119,13 @@ public class TherapyServiceImpl implements TherapyService {
             mailService.sendMail(
                     deniedTherapyRequestMail(patient.getEmail(), professional.getName(), analysis.getDenialJustification())
             );
+            therapy.setTherapyStatus(analysis.getStatus());
+            save(therapy);
+
         } else if (analysis.getStatus() == APPROVED) {
+            if (therapy.getTherapyModality() == ONLINE && (analysis.getApprovalSessionsUrl() == null || analysis.getApprovalSessionsUrl().isBlank())) {
+                throw new ApiRequestException(MISSING_SESSIONS_URL);
+            }
             // Automatically cancelling all therapy requests to the current professional that overlaps the therapy in analysis
             List<Therapy> professionalPendingTherapies = therapyRepository.findAllByProfessionalIdAndTherapyStatus(professional.getId(), PENDING);
             for (Therapy pendingTherapy : professionalPendingTherapies) {
@@ -116,6 +133,7 @@ public class TherapyServiceImpl implements TherapyService {
                     User patientNotified = userService.getById(pendingTherapy.getPatientId());
                     pendingTherapy.setTherapyStatus(CANCELED);
                     save(pendingTherapy);
+                    // notify patient about this occurence
                     mailService.sendMail(canceledTherapyRequestMail(patientNotified.getEmail(), professional.getName()));
                 }
             }
@@ -181,14 +199,20 @@ public class TherapyServiceImpl implements TherapyService {
             throw new ApiRequestException(THERAPY_MODALITY_NOT_ACCEPTED);
         }
 
-        // FIXME - TESTAR VALORES NULOS ENTRE METODO DE PAGAMENTO E PLANO DE SAÚDE
+        // Checking if the payment method and health plan were filled exclusively (XOR)
+        if ((therapyRequest.getPaymentMethod() == null) == (therapyRequest.getHealthPlan() == null)) {
+            throw new ApiRequestException(INVALID_PAYMENT_AND_HEALTH_PLAN_FIELDS);
+        }
+
         // Checking if the payment method is accepted by the professional
-        if (!requestedProfessionalData.getPaymentMethods().contains(therapyRequest.getPaymentMethod())) {
+        List<PaymentMethod> paymentMethods = requestedProfessionalData.getPaymentMethods();
+        if (therapyRequest.getPaymentMethod() != null && !paymentMethods.isEmpty() && !paymentMethods.contains(therapyRequest.getPaymentMethod())) {
             throw new ApiRequestException(PAYMENT_METHOD_NOT_ACCEPTED);
         }
 
         // Checking if the health plan is accepted by the professional
-        if (!requestedProfessionalData.getAcceptedHealthPlans().contains(therapyRequest.getHealthPlan())) {
+        List<HealthPlan> healthPlans = requestedProfessionalData.getAcceptedHealthPlans();
+        if (therapyRequest.getHealthPlan() != null && !healthPlans.isEmpty() && !healthPlans.contains(therapyRequest.getHealthPlan())) {
             throw new ApiRequestException(HEALTH_PLAN_NOT_ACCEPTED);
         }
 

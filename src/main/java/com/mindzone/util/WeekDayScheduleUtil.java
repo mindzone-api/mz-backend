@@ -4,6 +4,7 @@ import com.mindzone.model.user.TimeRange;
 import com.mindzone.model.user.WeekDaySchedule;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,7 +106,7 @@ public class WeekDayScheduleUtil {
      * @param s2 schedules to remove from s1
      * @return the final s1 list without s2 occurrences
      */
-    public static List<WeekDaySchedule> removeFrom(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2) {
+     public static List<WeekDaySchedule> removeFrom(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2) {
         for (WeekDaySchedule daySchedule2 : s2) {
             DayOfWeek day2 = daySchedule2.getDay();
             WeekDaySchedule daySchedule1 = s1.stream()
@@ -161,12 +162,44 @@ public class WeekDayScheduleUtil {
     }
 
     /**
-     * return the next occurence of a given schedule based on local time (UTC-3)
+     * return the next occurence of a given schedule based on UTC time
      * @param schedules the schedule to be analysed
      * @return the next occurence of the given schedule
      */
     public static WeekDaySchedule getNextOccurence(List<WeekDaySchedule> schedules) {
-        return null;
+        LocalDateTime now = LocalDateTime.now();
+        DayOfWeek currentDay = now.getDayOfWeek();
+        int currentMinutes = now.toLocalTime().toSecondOfDay() / 60;  // Convert current time to minutes since midnight
+
+        WeekDaySchedule nextOccurrence = null;
+
+        for (WeekDaySchedule schedule : schedules) {
+            DayOfWeek scheduleDay = schedule.getDay();
+
+            // Check if the day is today or a future day in the week
+            if (scheduleDay.getValue() < currentDay.getValue()) {
+                continue;  // Skip past days
+            }
+
+            for (TimeRange timeRange : schedule.getDaySchedule()) {
+                if (scheduleDay.equals(currentDay) && timeRange.getEndsAt() <= currentMinutes) {
+                    continue;  // Skip time ranges that have already ended today
+                }
+
+                // The first time range that hasn't ended is the next occurrence
+                nextOccurrence = new WeekDaySchedule();
+                nextOccurrence.setDay(scheduleDay);
+                nextOccurrence.setDaySchedule(List.of(timeRange));
+                return nextOccurrence;
+            }
+        }
+
+        // If no occurrence is found for the rest of the week, check the first occurrence next week
+        if (!schedules.isEmpty()) {
+            nextOccurrence = schedules.get(0);
+        }
+
+        return nextOccurrence;
     }
 }
 
