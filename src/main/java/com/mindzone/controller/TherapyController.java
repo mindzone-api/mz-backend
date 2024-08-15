@@ -1,9 +1,11 @@
 package com.mindzone.controller;
 
 import com.mindzone.dto.request.TherapyRequest;
+import com.mindzone.dto.request.TherapyRequestAnalysis;
 import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.dto.response.listed.ListedTherapy;
 import com.mindzone.enums.Role;
+import com.mindzone.enums.TherapyStatus;
 import com.mindzone.model.user.User;
 import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
@@ -26,8 +28,8 @@ public class TherapyController {
 
     @PostMapping("/request")
     public ResponseEntity<TherapyResponse> requestTherapy(JwtAuthenticationToken token, @RequestBody TherapyRequest therapyRequest) {
-        User user = userService.validateUser(token, Role.PATIENT);
-        return ResponseEntity.ok(therapyService.requestTherapy(therapyRequest, user));
+        User patient = userService.validateUser(token, Role.PATIENT);
+        return ResponseEntity.ok(therapyService.requestTherapy(therapyRequest, patient));
     }
 
     @GetMapping("/{id}")
@@ -48,8 +50,18 @@ public class TherapyController {
             @PathVariable String id,
             @RequestBody TherapyRequest therapyRequest
     ) {
-        User user = userService.validateUser(token, Role.PATIENT);
-        return ResponseEntity.ok(therapyService.updateRequest(user, id, therapyRequest));
+        User patient = userService.validateUser(token, Role.PATIENT);
+        return ResponseEntity.ok(therapyService.updateRequest(patient, id, therapyRequest));
+    }
+
+    @PutMapping("/analyse/{id}")
+    public ResponseEntity<TherapyResponse> analyseRequest(
+            JwtAuthenticationToken token,
+            @PathVariable String id,
+            @RequestBody TherapyRequestAnalysis analysis
+            ) {
+        User professional = userService.validateUser(token, Role.PROFESSIONAL);
+        return ResponseEntity.ok(therapyService.analyseRequest(professional, id, analysis));
     }
 
 
