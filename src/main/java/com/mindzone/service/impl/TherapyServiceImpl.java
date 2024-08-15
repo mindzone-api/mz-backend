@@ -27,8 +27,7 @@ import static com.mindzone.enums.Role.PATIENT;
 import static com.mindzone.enums.Role.PROFESSIONAL;
 import static com.mindzone.enums.TherapyStatus.*;
 import static com.mindzone.exception.ExceptionMessages.*;
-import static com.mindzone.util.WeekDayScheduleUtil.fitsIn;
-import static com.mindzone.util.WeekDayScheduleUtil.overlaps;
+import static com.mindzone.util.WeekDayScheduleUtil.*;
 
 @Service
 @AllArgsConstructor
@@ -92,39 +91,73 @@ public class TherapyServiceImpl implements TherapyService {
     @Override
     public TherapyResponse analyseRequest(User professional, String id, TherapyRequestAnalysis analysis) {
         Therapy therapy = getById(id);
-        // Checking if only allowed answers were sent
+        User patient = userService.getById(therapy.getPatientId());
+        canManage(professional, therapy);
+
+        // Checking if the analysis is valid
         if (analysis.getStatus() == PENDING || therapy.getTherapyStatus() == DENIED) {
             throw new ApiRequestException(INVALID_THERAPY_REQUEST_ANALYSIS);
         }
 
         // Checking if the denial was sent with a justification text
-        if (
-                analysis.getStatus() == DENIED &&
-                (analysis.getDenialJustification() == null || analysis.getDenialJustification().isBlank())
-        ) {
-            throw new ApiRequestException(MISSING_DENIAL_JUSTIFICATION);
+        if (analysis.getStatus() == DENIED) {
+            if (analysis.getDenialJustification() == null || analysis.getDenialJustification().isBlank()) {
+                throw new ApiRequestException(MISSING_DENIAL_JUSTIFICATION);
+            }
+            // notify patient about professional final analysis
+            mailService.sendMail(
+                    deniedTherapyRequestMail(patient.getEmail(), professional.getName(), analysis.getDenialJustification())
+            );
+        } else if (analysis.getStatus() == APPROVED) {
+            // Automatically cancelling all therapy requests to the current professional that overlaps the therapy in analysis
+            List<Therapy> professionalPendingTherapies = therapyRepository.findAllByProfessionalIdAndTherapyStatus(professional.getId(), PENDING);
+            for (Therapy pendingTherapy : professionalPendingTherapies) {
+                if (overlaps(therapy.getSchedule(), pendingTherapy.getSchedule())) {
+                    User patientNotified = userService.getById(pendingTherapy.getPatientId());
+                    pendingTherapy.setTherapyStatus(CANCELED);
+                    save(pendingTherapy);
+                    mailService.sendMail(canceledTherapyRequestMail(patientNotified.getEmail(), professional.getName()));
+                }
+            }
+
+            // Automatically cancelling all therapy requests that the patient made which overlaps the current therapy in analysis
+            List<Therapy> patientPendingTherapies = therapyRepository.findAllByPatientIdAndTherapyStatus(patient.getId(), PENDING);
+            for (Therapy pendingTherapy : patientPendingTherapies) {
+                if (overlaps(therapy.getSchedule(), pendingTherapy.getSchedule())) {
+                    pendingTherapy.setTherapyStatus(CANCELED);
+                    save(pendingTherapy);
+                    patientPendingTherapies.remove(pendingTherapy); // this list will be used once more below
+                }
+            }
+
+            // Automatically cancelling all therapy requests that the patient made to other professionals with the same profession
+            List<Therapy> sameProfessionPatientPendingTherapies = patientPendingTherapies.stream().filter(
+                    t -> userService.get(t.getProfessionalId()).getProfessionalInfo().getProfession() == professional.getProfessionalInfo().getProfession()
+            ).toList();
+            for (Therapy t : sameProfessionPatientPendingTherapies) {
+                t.setTherapyStatus(CANCELED);
+                save(t);
+            }
+
+            // Updates professional availability based on the current therapy in analysis
+            List<WeekDaySchedule> updatedAvailability = removeFrom(professional.getProfessionalInfo().getAvailability(), therapy.getSchedule());
+            professional.getProfessionalInfo().setAvailability(updatedAvailability);
+            userService.save(professional);
+
+            // update and save
+            therapy.setTherapyStatus(analysis.getStatus());
+            therapy.setSince(new Date());
+            therapy.setUrl(analysis.getApprovalSessionsUrl());
+            therapy.setActive(true);
+            therapy.setNextSession(getNextOccurence(therapy.getSchedule()));
+            therapy.setCompletedSessions(new ArrayList<>());
+            save(therapy);
+
+            // notify patient about professional final analysis
+            mailService.sendMail(
+                    approvedTherapyRequestMail(patient.getEmail(), professional.getName())
+            );
         }
-
-
-        User patient = userService.getById(therapy.getPatientId());
-        canManage(professional, therapy);
-
-        // TODO 1- negar automaticamente todos os choques de horário em status pendente para o profissional
-        // TODO 2- negar automaticamente todas as solicitações feitas do paciente para outros profissionais do mesmo ramo
-        // TODO 3- negar automaticamente  todos os choques de horário em status pendente criados pelo usuário
-        // TODO 4- atualizar horários disponíveis do profissional
-        // TODO 5- US15
-
-        // update and save
-        therapy.setTherapyStatus(analysis.getStatus());
-        save(therapy);
-
-        // notify patient about professional final analysis
-        mailService.sendMail(
-                analysis.getStatus() == APPROVED ?
-                        approvedTherapyRequestMail(patient.getEmail(), professional.getName()) :
-                        deniedTherapyRequestMail(patient.getEmail(), professional.getName(), analysis.getDenialJustification())
-        );
 
         return m.map(therapy, TherapyResponse.class);
     }

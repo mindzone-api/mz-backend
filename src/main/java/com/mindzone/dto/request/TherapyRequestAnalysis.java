@@ -12,4 +12,5 @@ public class TherapyRequestAnalysis {
 
     private TherapyStatus status;
     private String denialJustification;
+    private String approvalSessionsUrl;
 }

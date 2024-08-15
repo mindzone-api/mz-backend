@@ -43,4 +43,16 @@ public class MailsBody {
                         "justification:\n" + denialJustification
         );
     }
+
+    public static MailDTO canceledTherapyRequestMail(
+            String patientMail,
+            String professionalName
+    ) {
+        return new MailDTO(
+                patientMail,
+                "your therapy request to " + professionalName + " was canceled",
+                "Your therapy request to " + professionalName + " was automatically canceled due " +
+                        "to this professional schedule conflict. Try again with its updated availability!"
+        );
+    }
 }
