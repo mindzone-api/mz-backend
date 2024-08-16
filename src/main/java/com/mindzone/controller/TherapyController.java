@@ -1,7 +1,5 @@
 package com.mindzone.controller;
 
-import com.mindzone.dto.request.TherapyRequest;
-import com.mindzone.dto.request.TherapyRequestAnalysis;
 import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.dto.response.listed.ListedTherapy;
 import com.mindzone.model.user.User;
@@ -10,12 +8,14 @@ import com.mindzone.service.interfaces.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 import static com.mindzone.constants.Constants.V1;
-import static com.mindzone.enums.Role.PATIENT;
-import static com.mindzone.enums.Role.PROFESSIONAL;
 
 @RestController
 @AllArgsConstructor
@@ -24,28 +24,6 @@ public class TherapyController {
 
     private UserService userService;
     private TherapyService therapyService;
-
-    @PostMapping("/request")
-    public ResponseEntity<TherapyResponse> requestTherapy(JwtAuthenticationToken token, @RequestBody TherapyRequest therapyRequest) {
-        User patient = userService.validateUser(token, PATIENT);
-        return ResponseEntity.ok(therapyService.requestTherapy(therapyRequest, patient));
-    }
-
-    @PutMapping("request/{id}")
-    public ResponseEntity<TherapyResponse> updateRequest(
-            JwtAuthenticationToken token,
-            @PathVariable String id,
-            @RequestBody TherapyRequest therapyRequest
-    ) {
-        User patient = userService.validateUser(token, PATIENT);
-        return ResponseEntity.ok(therapyService.updateRequest(patient, id, therapyRequest));
-    }
-
-    @DeleteMapping("request/{id}")
-    public ResponseEntity<TherapyResponse> deleteRequest(JwtAuthenticationToken token, @PathVariable String id) {
-        User patient = userService.validateUser(token, PATIENT);
-        return ResponseEntity.ok(therapyService.deleteRequest(patient, id));
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<TherapyResponse> get(JwtAuthenticationToken token, @PathVariable String id) {
@@ -58,15 +36,4 @@ public class TherapyController {
         User user = userService.validateUser(token);
         return ResponseEntity.ok(therapyService.getAll(user));
     }
-
-    @PutMapping("/analyse/{id}")
-    public ResponseEntity<TherapyResponse> analyseRequest(
-            JwtAuthenticationToken token,
-            @PathVariable String id,
-            @RequestBody TherapyRequestAnalysis analysis
-            ) {
-        User professional = userService.validateUser(token, PROFESSIONAL);
-        return ResponseEntity.ok(therapyService.analyseRequest(professional, id, analysis));
-    }
-
 }
