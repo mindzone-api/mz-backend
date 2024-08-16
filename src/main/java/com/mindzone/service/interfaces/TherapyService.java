@@ -12,12 +12,10 @@ import java.util.List;
 public interface TherapyService {
 
     TherapyResponse requestTherapy(TherapyRequest therapyRequest, User patient);
-
-    TherapyResponse get(User user, String id);
-
-    List<ListedTherapy> getAll(User user);
-
     TherapyResponse updateRequest(User patient, String id, TherapyRequest therapyRequest);
-
+    TherapyResponse deleteRequest(User patient, String id);
+    TherapyResponse get(User user, String id);
+    List<ListedTherapy> getAll(User user);
     TherapyResponse analyseRequest(User professional, String id, TherapyRequestAnalysis analysis);
+
 }

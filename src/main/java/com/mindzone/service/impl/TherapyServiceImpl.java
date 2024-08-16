@@ -100,6 +100,17 @@ public class TherapyServiceImpl implements TherapyService {
     }
 
     @Override
+    public TherapyResponse deleteRequest(User patient, String id) {
+        Therapy therapy = getById(id);
+        canManage(patient, therapy);
+        if (therapy.getTherapyStatus() != PENDING) {
+            throw new ApiRequestException(THERAPY_IS_NOT_EDITABLE_ANYMORE);
+        }
+        therapyRepository.delete(therapy);
+        return m.map(therapy, TherapyResponse.class);
+    }
+
+    @Override
     public TherapyResponse analyseRequest(User professional, String id, TherapyRequestAnalysis analysis) {
         Therapy therapy = getById(id);
         User patient = userService.getById(therapy.getPatientId());

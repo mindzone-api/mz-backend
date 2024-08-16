@@ -20,4 +20,5 @@ public class TherapyResponse {
     private boolean active;
     private Date since;
     private List<WeekDaySchedule> schedule;
+    private WeekDaySchedule nextSession;
 }
