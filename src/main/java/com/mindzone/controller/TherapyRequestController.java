@@ -24,7 +24,10 @@ public class TherapyRequestController {
     private TherapyRequestService therapyRequestService;
 
     @PostMapping
-    public ResponseEntity<TherapyResponse> createRequest(JwtAuthenticationToken token, @RequestBody TherapyRequest therapyRequest) {
+    public ResponseEntity<TherapyResponse> createRequest(
+            JwtAuthenticationToken token,
+            @RequestBody TherapyRequest therapyRequest
+    ) {
         User patient = userService.validateUser(token, PATIENT);
         return ResponseEntity.ok(therapyRequestService.requestTherapy(therapyRequest, patient));
     }

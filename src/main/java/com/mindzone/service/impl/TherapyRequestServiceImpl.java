@@ -3,13 +3,9 @@ package com.mindzone.service.impl;
 import com.mindzone.dto.request.TherapyRequest;
 import com.mindzone.dto.request.TherapyRequestAnalysis;
 import com.mindzone.dto.response.TherapyResponse;
-import com.mindzone.dto.response.listed.ListedTherapy;
-import com.mindzone.enums.HealthPlan;
-import com.mindzone.enums.PaymentMethod;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.ProfessionalInfo;
-import com.mindzone.model.user.TimeRange;
 import com.mindzone.model.user.User;
 import com.mindzone.model.user.WeekDaySchedule;
 import com.mindzone.repository.TherapyRepository;
@@ -26,8 +22,6 @@ import java.util.Date;
 import java.util.List;
 
 import static com.mindzone.constants.MailsBody.*;
-import static com.mindzone.enums.Role.PATIENT;
-import static com.mindzone.enums.Role.PROFESSIONAL;
 import static com.mindzone.enums.TherapyModality.ONLINE;
 import static com.mindzone.enums.TherapyStatus.*;
 import static com.mindzone.exception.ExceptionMessages.*;
@@ -76,7 +70,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
         Therapy therapy = t.getById(id);
         t.canManage(patient, therapy);
         if (therapy.getTherapyStatus() != PENDING) {
-            throw new ApiRequestException(THERAPY_IS_NOT_EDITABLE_ANYMORE);
+            throw new ApiRequestException(THERAPY_IS_NOT_EDITABLE);
         }
         checkTherapyRequestValidation(therapyRequest, patient);
         m.map(therapyRequest, therapy);
@@ -89,7 +83,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
         Therapy therapy = t.getById(id);
         t.canManage(patient, therapy);
         if (therapy.getTherapyStatus() != PENDING) {
-            throw new ApiRequestException(THERAPY_IS_NOT_EDITABLE_ANYMORE);
+            throw new ApiRequestException(THERAPY_IS_NOT_EDITABLE);
         }
         therapyRepository.delete(therapy);
         return m.map(therapy, TherapyResponse.class);
@@ -176,48 +170,16 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
         return m.map(therapy, TherapyResponse.class);
     }
 
-    private void checkTherapyRequestValidation(TherapyRequest therapyRequest, User user) {
+    private void checkTherapyRequestValidation(TherapyRequest therapyRequest, User patient) {
         User requestedProfessional = userService.getById(therapyRequest.getProfessionalId());
-        ProfessionalInfo requestedProfessionalData = requestedProfessional.getProfessionalInfo();
+        ProfessionalInfo info = requestedProfessional.getProfessionalInfo();
+        t.checkTherapyValidation(therapyRequest, info);
 
-        // Checking if the modality requested is accepted by the professional
-        if (!requestedProfessionalData.getTherapyModalities().contains(therapyRequest.getTherapyModality())) {
-            throw new ApiRequestException(THERAPY_MODALITY_NOT_ACCEPTED);
-        }
-
-        // Checking if the payment method and health plan were filled exclusively (XOR)
-        if ((therapyRequest.getPaymentMethod() == null) == (therapyRequest.getHealthPlan() == null)) {
-            throw new ApiRequestException(INVALID_PAYMENT_AND_HEALTH_PLAN_FIELDS);
-        }
-
-        // Checking if the payment method is accepted by the professional
-        List<PaymentMethod> paymentMethods = requestedProfessionalData.getPaymentMethods();
-        if (therapyRequest.getPaymentMethod() != null && !paymentMethods.isEmpty() && !paymentMethods.contains(therapyRequest.getPaymentMethod())) {
-            throw new ApiRequestException(PAYMENT_METHOD_NOT_ACCEPTED);
-        }
-
-        // Checking if the health plan is accepted by the professional
-        List<HealthPlan> healthPlans = requestedProfessionalData.getAcceptedHealthPlans();
-        if (therapyRequest.getHealthPlan() != null && !healthPlans.isEmpty() && !healthPlans.contains(therapyRequest.getHealthPlan())) {
-            throw new ApiRequestException(HEALTH_PLAN_NOT_ACCEPTED);
-        }
-
-        // Checking if the amount of time requested fits in the requested professional SessionDuration
-        long professionalSessionDuration = requestedProfessionalData.getSessionDuration().toMinutes();
-        for (WeekDaySchedule weekDaySchedule : therapyRequest.getSchedule()) {
-            for (TimeRange timeRange : weekDaySchedule.getDaySchedule()) {
-                long requestedSessionDuration = timeRange.getEndsAt() - timeRange.getStartsAt();
-                if (requestedSessionDuration % professionalSessionDuration != 0) {
-                    throw new ApiRequestException(INVALID_SESSION_DURATION_REQUEST);
-                }
-            }
-        }
-
-        List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndTherapyStatus(user.getId(), APPROVED);
+        List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndTherapyStatus(patient.getId(), APPROVED);
         for (Therapy patientTherapy : patientTherapies) {
             // Checking if patient is already in therapy with the profession requested
             User activeProfessional = userService.getById(patientTherapy.getProfessionalId());
-            if (activeProfessional.getProfessionalInfo().getProfession() == requestedProfessionalData.getProfession()) {
+            if (activeProfessional.getProfessionalInfo().getProfession() == info.getProfession()) {
                 throw new ApiRequestException(PATIENT_IS_ALREADY_IN_THERAPY_WITH_THIS_PROFESSION);
             }
 
@@ -226,11 +188,6 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
             if (overlaps(therapyRequest.getSchedule(), patientTherapy.getSchedule())) {
                 throw new ApiRequestException(THERAPY_TIME_CONFLICT);
             }
-        }
-
-        // Checking if the requested therapy schedule fits in the professional availability
-        if (!fitsIn(requestedProfessionalData.getAvailability(), therapyRequest.getSchedule())) {
-            throw new ApiRequestException(INVALID_THERAPY_SCHEDULE);
         }
     }
 }

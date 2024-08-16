@@ -26,13 +26,13 @@ public class Therapy extends AbstractModel implements Serializable {
     private String patientId;
     private String professionalId;
     private Date since;
-    private TherapyModality therapyModality; // sim
+    private TherapyModality therapyModality;
     private TherapyStatus therapyStatus;
-    private String url; // sim
+    private String url;
     private Boolean active;
-    private PaymentMethod paymentMethod; // sim
-    private HealthPlan healthPlan; // sim
-    private List<WeekDaySchedule> schedule; // sim
+    private PaymentMethod paymentMethod;
+    private HealthPlan healthPlan;
+    private List<WeekDaySchedule> schedule;
     private WeekDaySchedule nextSession;
     private List<Session> completedSessions;
 }

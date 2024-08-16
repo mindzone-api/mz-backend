@@ -201,5 +201,49 @@ public class WeekDayScheduleUtil {
 
         return nextOccurrence;
     }
+
+    /**
+     * Merges occurrences from s2 into s1.
+     * If s2 contains intervals that fill gaps or connect adjacent intervals in s1,
+     * they will be merged into a single interval.
+     *
+     * @param s1 schedules to be updated
+     * @param s2 schedules to merge into s1
+     * @return the updated s1 list with merged intervals from s2
+     */
+    public static List<WeekDaySchedule> mergeWith(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2) {
+        for (WeekDaySchedule s2Schedule : s2) {
+            for (WeekDaySchedule s1Schedule : s1) {
+                if (s1Schedule.getDay().equals(s2Schedule.getDay())) {
+                    List<TimeRange> mergedRanges = new ArrayList<>();
+                    List<TimeRange> s1Ranges = s1Schedule.getDaySchedule();
+                    List<TimeRange> s2Ranges = s2Schedule.getDaySchedule();
+
+                    int i = 0, j = 0;
+                    while (i < s1Ranges.size() || j < s2Ranges.size()) {
+                        TimeRange current;
+                        if (i < s1Ranges.size() && (j >= s2Ranges.size() || s1Ranges.get(i).getStartsAt() <= s2Ranges.get(j).getStartsAt())) {
+                            current = s1Ranges.get(i++);
+                        } else {
+                            current = s2Ranges.get(j++);
+                        }
+
+                        if (!mergedRanges.isEmpty() && mergedRanges.get(mergedRanges.size() - 1).getEndsAt() >= current.getStartsAt()) {
+                            // Merge overlapping or adjacent ranges
+                            mergedRanges.get(mergedRanges.size() - 1)
+                                    .setEndsAt(Math.max(mergedRanges.get(mergedRanges.size() - 1).getEndsAt(), current.getEndsAt()));
+                        } else {
+                            mergedRanges.add(current);
+                        }
+                    }
+
+                    // Replace the old schedule with the merged one
+                    s1Schedule.setDaySchedule(mergedRanges);
+                }
+            }
+        }
+
+        return s1;
+    }
 }
 
