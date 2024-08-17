@@ -56,11 +56,4 @@ public class ProfessionalServiceImpl implements ProfessionalService {
         }
         return allies;
     }
-
-    @Override
-    public UserResponse updateAvailability(User user, List<WeekDaySchedule> schedule) {
-        user.getProfessionalInfo().setAvailability(schedule);
-        userService.save(user);
-        return m.map(user, UserResponse.class);
-    }
 }

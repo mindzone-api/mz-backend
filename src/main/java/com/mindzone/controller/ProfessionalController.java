@@ -40,12 +40,6 @@ public class ProfessionalController {
         return ResponseEntity.ok(professionalService.getMyAllies(user));
     }
 
-    @PutMapping("/schedule")
-    public ResponseEntity<UserResponse> updateAvailability(JwtAuthenticationToken token, @RequestBody List<WeekDaySchedule> schedule) {
-        User user = userService.validateUser(token, PROFESSIONAL);
-        return ResponseEntity.ok(professionalService.updateAvailability(user, schedule));
-    }
-
     @GetMapping("/search")
     public ResponseEntity<Page<ListedProfessional>> search(JwtAuthenticationToken token, @RequestBody SearchFilter filter) {
         userService.validateUser(token);

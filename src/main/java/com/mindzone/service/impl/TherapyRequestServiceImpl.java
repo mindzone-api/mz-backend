@@ -189,5 +189,10 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
                 throw new ApiRequestException(THERAPY_TIME_CONFLICT);
             }
         }
+
+        // Checking if the requested therapy schedule fits in the professional availability
+        if (!fitsIn(info.getAvailability(), therapyRequest.getSchedule())) {
+            throw new ApiRequestException(INVALID_THERAPY_SCHEDULE);
+        }
     }
 }

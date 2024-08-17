@@ -151,10 +151,5 @@ public class TherapyServiceImpl implements TherapyService {
                 }
             }
         }
-
-        // Checking if the requested therapy schedule fits in the professional availability
-        if (!fitsIn(info.getAvailability(), ttv.getSchedule())) {
-            throw new ApiRequestException(INVALID_THERAPY_SCHEDULE);
-        }
     }
 }

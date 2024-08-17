@@ -13,6 +13,4 @@ public interface ProfessionalService {
     List<ListedPatient> getMyPatients(User user);
 
     List<ListedAlly> getMyAllies(User user);
-
-    UserResponse updateAvailability(User user, List<WeekDaySchedule> schedule);
 }
