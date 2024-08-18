@@ -6,6 +6,7 @@ import com.mindzone.model.user.WeekDaySchedule;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class WeekDayScheduleUtil {
@@ -209,9 +210,8 @@ public class WeekDayScheduleUtil {
      *
      * @param s1 schedules to be updated
      * @param s2 schedules to merge into s1
-     * @return the updated s1 list with merged intervals from s2
      */
-    public static List<WeekDaySchedule> mergeWith(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2) {
+    public static void mergeWith(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2) {
         for (WeekDaySchedule s2Schedule : s2) {
             for (WeekDaySchedule s1Schedule : s1) {
                 if (s1Schedule.getDay().equals(s2Schedule.getDay())) {
@@ -219,31 +219,77 @@ public class WeekDayScheduleUtil {
                     List<TimeRange> s1Ranges = s1Schedule.getDaySchedule();
                     List<TimeRange> s2Ranges = s2Schedule.getDaySchedule();
 
-                    int i = 0, j = 0;
-                    while (i < s1Ranges.size() || j < s2Ranges.size()) {
-                        TimeRange current;
-                        if (i < s1Ranges.size() && (j >= s2Ranges.size() || s1Ranges.get(i).getStartsAt() <= s2Ranges.get(j).getStartsAt())) {
-                            current = s1Ranges.get(i++);
-                        } else {
-                            current = s2Ranges.get(j++);
-                        }
-
-                        if (!mergedRanges.isEmpty() && mergedRanges.get(mergedRanges.size() - 1).getEndsAt() >= current.getStartsAt()) {
-                            // Merge overlapping or adjacent ranges
-                            mergedRanges.get(mergedRanges.size() - 1)
-                                    .setEndsAt(Math.max(mergedRanges.get(mergedRanges.size() - 1).getEndsAt(), current.getEndsAt()));
-                        } else {
-                            mergedRanges.add(current);
-                        }
-                    }
+                    mergeIterator(mergedRanges, s1Ranges, s2Ranges);
 
                     // Replace the old schedule with the merged one
                     s1Schedule.setDaySchedule(mergedRanges);
                 }
             }
         }
+    }
 
-        return s1;
+    /**
+     * Merges occurrences from s2 into s1, constrained by the limits specified in limit.
+     * If s2 contains intervals that can be merged with s1, the merge will be restricted by the intervals in limit.
+     *
+     * @param s1    schedules to be updated
+     * @param s2    schedules to merge into s1
+     * @param limit schedules that define the maximum allowable range for merging
+     */
+    public static void mergeWith(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2, List<WeekDaySchedule> limit) {
+        for (WeekDaySchedule s2Schedule : s2) {
+            for (WeekDaySchedule s1Schedule : s1) {
+                if (s1Schedule.getDay().equals(s2Schedule.getDay())) {
+                    List<TimeRange> mergedRanges = new ArrayList<>();
+                    List<TimeRange> s1Ranges = s1Schedule.getDaySchedule();
+                    List<TimeRange> s2Ranges = s2Schedule.getDaySchedule();
+                    List<TimeRange> limitRanges = limit.stream()
+                            .filter(l -> l.getDay().equals(s1Schedule.getDay()))
+                            .findFirst()
+                            .map(WeekDaySchedule::getDaySchedule)
+                            .orElse(Collections.emptyList());
+
+                    mergeIterator(mergedRanges, s1Ranges, s2Ranges);
+
+                    // Apply limit constraints
+                    List<TimeRange> constrainedRanges = new ArrayList<>();
+                    for (TimeRange merged : mergedRanges) {
+                        for (TimeRange lim : limitRanges) {
+                            if (merged.getEndsAt() > lim.getStartsAt() && merged.getStartsAt() < lim.getEndsAt()) {
+                                constrainedRanges.add(new TimeRange(
+                                        Math.max(merged.getStartsAt(), lim.getStartsAt()),
+                                        Math.min(merged.getEndsAt(), lim.getEndsAt())
+                                ));
+                            }
+                        }
+                    }
+
+                    // Replace the old schedule with the constrained one
+                    s1Schedule.setDaySchedule(constrainedRanges);
+                }
+            }
+        }
+
+    }
+
+    private static void mergeIterator(List<TimeRange> mergedRanges, List<TimeRange> s1Ranges, List<TimeRange> s2Ranges) {
+        int i = 0, j = 0;
+        while (i < s1Ranges.size() || j < s2Ranges.size()) {
+            TimeRange current;
+            if (i < s1Ranges.size() && (j >= s2Ranges.size() || s1Ranges.get(i).getStartsAt() <= s2Ranges.get(j).getStartsAt())) {
+                current = s1Ranges.get(i++);
+            } else {
+                current = s2Ranges.get(j++);
+            }
+
+            if (!mergedRanges.isEmpty() && mergedRanges.get(mergedRanges.size() - 1).getEndsAt() >= current.getStartsAt()) {
+                // Merge overlapping or adjacent ranges
+                mergedRanges.get(mergedRanges.size() - 1)
+                        .setEndsAt(Math.max(mergedRanges.get(mergedRanges.size() - 1).getEndsAt(), current.getEndsAt()));
+            } else {
+                mergedRanges.add(current);
+            }
+        }
     }
 }
 

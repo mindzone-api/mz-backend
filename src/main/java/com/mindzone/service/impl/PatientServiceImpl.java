@@ -1,5 +1,7 @@
 package com.mindzone.service.impl;
 
+import com.mindzone.dto.request.UserRequest;
+import com.mindzone.dto.response.UserResponse;
 import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
@@ -33,6 +35,13 @@ public class PatientServiceImpl implements PatientService {
             professionals.add(listedProfessional);
         }
         return professionals;
+    }
+
+    @Override
+    public UserResponse update(User patient, UserRequest request) {
+        m.map(request, patient);
+        userService.save(patient);
+        return m.map(patient, UserResponse.class);
     }
 
 

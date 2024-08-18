@@ -19,5 +19,4 @@ public interface TherapyService {
     TherapyResponse get(User user, String id);
     List<ListedTherapy> getAll(User user);
     TherapyResponse update(User professional, String id, TherapyUpdate therapyUpdate);
-    void checkTherapyValidation(TherapyToValidate ttv, ProfessionalInfo info);
 }

@@ -13,9 +13,6 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 public class UserRequest {
-    private String name;
-    private String email;
-    private String profilePictureURL;
     private Date birthDate;
     private Gender gender;
     private String address;

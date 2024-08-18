@@ -1,6 +1,7 @@
 package com.mindzone.controller;
 
 import com.mindzone.dto.request.SearchFilter;
+import com.mindzone.dto.request.UserRequest;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.dto.response.listed.ListedPatient;
 import com.mindzone.dto.response.listed.ListedAlly;
@@ -44,6 +45,12 @@ public class ProfessionalController {
     public ResponseEntity<Page<ListedProfessional>> search(JwtAuthenticationToken token, @RequestBody SearchFilter filter) {
         userService.validateUser(token);
         return ResponseEntity.ok(userService.search(filter));
+    }
+
+    @PutMapping
+    public ResponseEntity<UserResponse> update(JwtAuthenticationToken token, @RequestBody UserRequest request) {
+        User professional = userService.validateUser(token, PROFESSIONAL);
+        return ResponseEntity.ok(professionalService.update(professional, request));
     }
 
 }

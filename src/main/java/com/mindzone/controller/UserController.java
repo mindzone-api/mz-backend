@@ -21,20 +21,14 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponse> signUp(@RequestBody UserRequest userRequest) {
-        return new ResponseEntity<>(userService.signUp(userRequest), HttpStatus.CREATED);
+    public ResponseEntity<UserResponse> signUp(JwtAuthenticationToken token, @RequestBody UserRequest userRequest) {
+        return new ResponseEntity<>(userService.signUp(token, userRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> get(JwtAuthenticationToken token, @PathVariable String id) {
         userService.validateUser(token);
         return ResponseEntity.ok(userService.get(id));
-    }
-
-    @PutMapping
-    public ResponseEntity<UserResponse> update(JwtAuthenticationToken token, @RequestBody UserRequest userRequest) {
-        User user = userService.validateUser(token);
-        return ResponseEntity.ok(userService.update(user.getId(), userRequest));
     }
 
     @GetMapping

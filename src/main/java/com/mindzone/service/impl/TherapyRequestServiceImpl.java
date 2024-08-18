@@ -95,16 +95,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
         User patient = userService.getById(therapy.getPatientId());
         t.canManage(professional, therapy);
 
-        // Checking if the analysis is valid
-        if (analysis.getStatus() == PENDING || therapy.getTherapyStatus() == DENIED) {
-            throw new ApiRequestException(INVALID_THERAPY_REQUEST_ANALYSIS);
-        }
-
-        // Checking if the denial was sent with a justification text
         if (analysis.getStatus() == DENIED) {
-            if (analysis.getDenialJustification() == null || analysis.getDenialJustification().isBlank()) {
-                throw new ApiRequestException(MISSING_DENIAL_JUSTIFICATION);
-            }
             // notify patient about professional final analysis
             mailService.sendMail(
                     deniedTherapyRequestMail(patient.getEmail(), professional.getName(), analysis.getDenialJustification())
@@ -113,9 +104,6 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
             t.save(therapy);
 
         } else if (analysis.getStatus() == APPROVED) {
-            if (therapy.getTherapyModality() == ONLINE && (analysis.getApprovalSessionsUrl() == null || analysis.getApprovalSessionsUrl().isBlank())) {
-                throw new ApiRequestException(MISSING_SESSIONS_URL);
-            }
             // Automatically cancelling all therapy requests to the current professional that overlaps the therapy in analysis
             List<Therapy> professionalPendingTherapies = therapyRepository.findAllByProfessionalIdAndTherapyStatus(professional.getId(), PENDING);
             for (Therapy pendingTherapy : professionalPendingTherapies) {
@@ -173,9 +161,8 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
     private void checkTherapyRequestValidation(TherapyRequest therapyRequest, User patient) {
         User requestedProfessional = userService.getById(therapyRequest.getProfessionalId());
         ProfessionalInfo info = requestedProfessional.getProfessionalInfo();
-        t.checkTherapyValidation(therapyRequest, info);
 
-        List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndTherapyStatus(patient.getId(), APPROVED);
+        List<Therapy> patientTherapies = therapyRepository.findAllByProfessionalIdAndActiveIsTrue(patient.getId());
         for (Therapy patientTherapy : patientTherapies) {
             // Checking if patient is already in therapy with the profession requested
             User activeProfessional = userService.getById(patientTherapy.getProfessionalId());
@@ -192,7 +179,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
 
         // Checking if the requested therapy schedule fits in the professional availability
         if (!fitsIn(info.getAvailability(), therapyRequest.getSchedule())) {
-            throw new ApiRequestException(INVALID_THERAPY_SCHEDULE);
+            throw new ApiRequestException(THERAPY_TIME_CONFLICT);
         }
     }
 }

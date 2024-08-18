@@ -1,5 +1,6 @@
 package com.mindzone.service.interfaces;
 
+import com.mindzone.dto.request.UserRequest;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.dto.response.listed.ListedPatient;
 import com.mindzone.model.user.User;
@@ -13,4 +14,6 @@ public interface ProfessionalService {
     List<ListedPatient> getMyPatients(User user);
 
     List<ListedAlly> getMyAllies(User user);
+
+    UserResponse update(User professional, UserRequest request);
 }

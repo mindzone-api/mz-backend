@@ -56,7 +56,7 @@ public class TherapyServiceImpl implements TherapyService {
                 throw new ApiRequestException(USER_UNAUTHORIZED);
             }
         } else if (user.getRole() == PROFESSIONAL) {
-            List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndTherapyStatus(therapy.getPatientId(), APPROVED);
+            List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndActiveIsTrue(therapy.getPatientId());
             List<Therapy> patientTherapiesWithLoggedProfessional = patientTherapies.stream().filter(t -> t.getProfessionalId().equals(user.getId())).toList();
             if (patientTherapiesWithLoggedProfessional.isEmpty()) {
                 throw new ApiRequestException(USER_UNAUTHORIZED);
@@ -92,11 +92,13 @@ public class TherapyServiceImpl implements TherapyService {
     public TherapyResponse update(User professional, String id, TherapyUpdate therapyUpdate) {
         Therapy therapy = getById(id);
         canManage(professional, therapy);
-        if (therapy.getTherapyStatus() != APPROVED) {
-            throw new ApiRequestException(THERAPY_IS_NOT_EDITABLE);
-        }
-        checkTherapyValidation(therapyUpdate, professional.getProfessionalInfo());
-        professional.getProfessionalInfo().setAvailability(updateProfessionalSchedule(professional, therapy.getSchedule(), therapyUpdate.getSchedule()));
+        professional.getProfessionalInfo().setAvailability(
+                updateProfessionalSchedule(
+                        professional,
+                        therapy.getSchedule(),
+                        therapyUpdate.getSchedule()
+                )
+        );
         m.map(therapyUpdate, therapy);
         therapy.setSchedule(therapyUpdate.getSchedule());
         therapy.setNextSession(getNextOccurence(therapy.getSchedule()));
@@ -110,46 +112,24 @@ public class TherapyServiceImpl implements TherapyService {
         return m.map(therapy, TherapyResponse.class);
     }
 
-    // Used in therapy update. The oldSchedule will be added back and the new one will be removed from his agenda
-    private List<WeekDaySchedule> updateProfessionalSchedule(User professional, List<WeekDaySchedule> oldSchedule, List<WeekDaySchedule> newSchedule) {
-        List<WeekDaySchedule> scheduleWithoutOld = mergeWith(professional.getProfessionalInfo().getAvailability(), oldSchedule);
-        return removeFrom(scheduleWithoutOld, newSchedule);
-    }
+    // The oldSchedule will be added back and the new one will be removed from his agenda
+    private List<WeekDaySchedule> updateProfessionalSchedule(User professional, List<WeekDaySchedule> oldTherapySchedule, List<WeekDaySchedule> newTherapySchedule) {
+        List<WeekDaySchedule> agenda = professional.getProfessionalInfo().getAgenda();
+        List<WeekDaySchedule> availability = professional.getProfessionalInfo().getAvailability();
 
-    public void checkTherapyValidation(TherapyToValidate ttv, ProfessionalInfo info) {
-        // Checking if the modality requested is accepted by the professional
-        if (!info.getTherapyModalities().contains(ttv.getTherapyModality())) {
-            throw new ApiRequestException(THERAPY_MODALITY_NOT_ACCEPTED);
+        if (fitsIn(availability, newTherapySchedule)) {
+            removeFrom(availability, newTherapySchedule);
+        } else if (fitsIn(agenda, newTherapySchedule)) {
+            throw new ApiRequestException(THERAPY_TIME_CONFLICT);
+        } else if (overlaps(availability, newTherapySchedule)) {
+            removeFrom(availability, newTherapySchedule);
         }
 
-        // Checking if the payment method and health plan were filled exclusively (XOR)
-        boolean hasPayment = ttv.getPaymentMethod() != null;
-        boolean hasHealthPlan = ttv.getHealthPlan() != null;
-        if (hasPayment == hasHealthPlan) {
-            throw new ApiRequestException(INVALID_PAYMENT_AND_HEALTH_PLAN_FIELDS);
+        if (fitsIn(agenda, oldTherapySchedule)) {
+            mergeWith(availability, oldTherapySchedule);
+        } else if (overlaps(agenda, oldTherapySchedule)) {
+            mergeWith(availability, oldTherapySchedule, agenda);
         }
-
-        // Checking if the payment method is accepted by the professional
-        List<PaymentMethod> paymentMethods = info.getPaymentMethods();
-        if (hasPayment && !paymentMethods.isEmpty() && !paymentMethods.contains(ttv.getPaymentMethod())) {
-            throw new ApiRequestException(PAYMENT_METHOD_NOT_ACCEPTED);
-        }
-
-        // Checking if the health plan is accepted by the professional
-        List<HealthPlan> healthPlans = info.getAcceptedHealthPlans();
-        if (hasHealthPlan && !healthPlans.isEmpty() && !healthPlans.contains(ttv.getHealthPlan())) {
-            throw new ApiRequestException(HEALTH_PLAN_NOT_ACCEPTED);
-        }
-
-        // Checking if the amount of time requested fits in the requested professional SessionDuration
-        long professionalSessionDuration = info.getSessionDuration().toMinutes();
-        for (WeekDaySchedule weekDaySchedule : ttv.getSchedule()) {
-            for (TimeRange timeRange : weekDaySchedule.getDaySchedule()) {
-                long requestedSessionDuration = timeRange.getEndsAt() - timeRange.getStartsAt();
-                if (requestedSessionDuration % professionalSessionDuration != 0) {
-                    throw new ApiRequestException(INVALID_SESSION_DURATION);
-                }
-            }
-        }
+        return availability;
     }
 }

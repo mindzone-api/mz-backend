@@ -10,28 +10,14 @@ public class ExceptionMessages {
     public static final String USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS";
     public static final String PROFESSIONAL_CODE_ALREADY_EXISTS = "PROFESSIONAL_CODE_ALREADY_EXISTS";
 
-    public static final String UNABLE_TO_SWITCH_ROLES = "UNABLE_TO_SWITCH_ROLES";
-    public static final String UNABLE_TO_SWITCH_EMAIL_ADDRESS = "UNABLE_TO_SWITCH_EMAIL_ADDRESS";
-
     // --------------- THERAPY --------------- \\
 
     public static final String PATIENT_IS_ALREADY_IN_THERAPY_WITH_THIS_PROFESSION = "PATIENT_IS_ALREADY_IN_THERAPY_WITH_THIS_PROFESSION";
     public static final String THERAPY_ALREADY_EXISTS = "THERAPY_ALREADY_EXISTS";
-    public static final String THERAPY_MODALITY_NOT_ACCEPTED = "THERAPY_MODALITY_NOT_ACCEPTED";
-    public static final String INVALID_PAYMENT_AND_HEALTH_PLAN_FIELDS = "INVALID_PAYMENT_AND_HEALTH_PLAN_FIELDS";
-    public static final String PAYMENT_METHOD_NOT_ACCEPTED = "PAYMENT_METHOD_NOT_ACCEPTED";
-    public static final String HEALTH_PLAN_NOT_ACCEPTED = "HEALTH_PLAN_NOT_ACCEPTED";
-    public static final String INVALID_THERAPY_SCHEDULE = "INVALID_THERAPY_SCHEDULE";
-    public static final String INVALID_SESSION_DURATION = "INVALID_SESSION_DURATION";
     public static final String THERAPY_TIME_CONFLICT = "THERAPY_TIME_CONFLICT";
     public static final String THERAPY_NOT_FOUND = "THERAPY_NOT_FOUND";
     public static final String THERAPY_IS_NOT_EDITABLE = "THERAPY_IS_NOT_EDITABLE";
-    public static final String MISSING_DENIAL_JUSTIFICATION = "MISSING_DENIAL_JUSTIFICATION";
-    public static final String MISSING_SESSIONS_URL = "MISSING_SESSIONS_URL";
-    public static final String INVALID_THERAPY_REQUEST_ANALYSIS = "INVALID_THERAPY_REQUEST_ANALYSIS";
 
-    // --------------- SESSIONS --------------- \\
 
-    public static final String INVALID_TIME_RANGE = "INVALID_TIME_RANGE";
 
 }

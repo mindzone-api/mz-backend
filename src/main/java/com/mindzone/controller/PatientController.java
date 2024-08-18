@@ -1,5 +1,7 @@
 package com.mindzone.controller;
 
+import com.mindzone.dto.request.UserRequest;
+import com.mindzone.dto.response.UserResponse;
 import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.model.user.User;
 import com.mindzone.service.interfaces.PatientService;
@@ -26,5 +28,11 @@ public class PatientController {
     public ResponseEntity<List<ListedProfessional>> getMyProfessionals(JwtAuthenticationToken token) {
         User user = userService.validateUser(token, PATIENT);
         return ResponseEntity.ok(patientService.getMyProfessionals(user));
+    }
+
+    @PutMapping
+    public ResponseEntity<UserResponse> update(JwtAuthenticationToken token, @RequestBody UserRequest request) {
+        User patient = userService.validateUser(token, PATIENT);
+        return ResponseEntity.ok(patientService.update(patient, request));
     }
 }

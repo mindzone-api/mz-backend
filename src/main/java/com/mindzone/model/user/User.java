@@ -31,5 +31,7 @@ public class User extends AbstractModel implements Serializable {
     private String city;
     private State state;
     private ProfessionalInfo professionalInfo;
+    private String stripeId;
+    private String subscriptionId;
 
 }

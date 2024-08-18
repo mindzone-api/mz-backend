@@ -33,7 +33,4 @@ public class ProfessionalInfo  implements Serializable {
     private List<WeekDaySchedule> availability;
     private List<WeekDaySchedule> agenda;
     private List<PatientFeedback> feedbacks;
-
-    private String stripeId;
-    private String subscriptionId;
 }
