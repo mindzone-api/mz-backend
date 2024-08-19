@@ -3,10 +3,11 @@ package com.mindzone.util;
 import com.mindzone.model.user.TimeRange;
 import com.mindzone.model.user.WeekDaySchedule;
 
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class WeekDayScheduleUtil {
@@ -163,44 +164,54 @@ public class WeekDayScheduleUtil {
     }
 
     /**
-     * return the next occurence of a given schedule based on UTC time
-     * @param schedules the schedule to be analysed
-     * @return the next occurence of the given schedule
+     * Returns the next session time as a Date object based on the provided date and time.
+     * The WeekDaySchedule list is expected to be sorted from Monday to Sunday, and within each day, from earlier to later times.
+     *
+     * @param schedules list of WeekDaySchedule containing recurring weekly sessions.
+     * @param fromDate the starting Date from which to search for the next session.
+     * @return a Date object representing the next session time, or null if no upcoming session is found.
      */
-    public static WeekDaySchedule getNextOccurence(List<WeekDaySchedule> schedules) {
-        LocalDateTime now = LocalDateTime.now();
-        DayOfWeek currentDay = now.getDayOfWeek();
-        int currentMinutes = now.toLocalTime().toSecondOfDay() / 60;  // Convert current time to minutes since midnight
+    public static Date getNextOccurrence(List<WeekDaySchedule> schedules, Date fromDate) {
+        // Convert fromDate to LocalDateTime in the local time zone
+        LocalDateTime fromDateTime = LocalDateTime.ofInstant(fromDate.toInstant(), ZoneId.systemDefault());
 
-        WeekDaySchedule nextOccurrence = null;
-
+        // Loop through the schedules to find the next occurrence
         for (WeekDaySchedule schedule : schedules) {
-            DayOfWeek scheduleDay = schedule.getDay();
-
-            // Check if the day is today or a future day in the week
-            if (scheduleDay.getValue() < currentDay.getValue()) {
-                continue;  // Skip past days
-            }
-
+            // Loop through each TimeRange to find the next time
             for (TimeRange timeRange : schedule.getDaySchedule()) {
-                if (scheduleDay.equals(currentDay) && timeRange.getEndsAt() <= currentMinutes) {
-                    continue;  // Skip time ranges that have already ended today
+                // If the current day matches the schedule day
+                if (schedule.getDay().equals(fromDateTime.getDayOfWeek())) {
+                    // If the current time is before the end of the time range, return the next occurrence
+                    if (timeRange.getEndsAt() > fromDateTime.getHour() * 60 + fromDateTime.getMinute()) {
+                        return Date.from(fromDateTime.withHour(timeRange.getStartsAt() / 60)
+                                .withMinute(timeRange.getStartsAt() % 60)
+                                .withSecond(0)
+                                .withNano(0)
+                                .atZone(ZoneId.systemDefault()).toInstant());
+                    }
                 }
-
-                // The first time range that hasn't ended is the next occurrence
-                nextOccurrence = new WeekDaySchedule();
-                nextOccurrence.setDay(scheduleDay);
-                nextOccurrence.setDaySchedule(List.of(timeRange));
-                return nextOccurrence;
+                // If the schedule day is after the current day, find the next day with a scheduled time
+                if (schedule.getDay().getValue() > fromDateTime.getDayOfWeek().getValue()) {
+                    return Date.from(fromDateTime.with(TemporalAdjusters.next(schedule.getDay()))
+                            .withHour(timeRange.getStartsAt() / 60)
+                            .withMinute(timeRange.getStartsAt() % 60)
+                            .withSecond(0)
+                            .withNano(0)
+                            .atZone(ZoneId.systemDefault()).toInstant());
+                }
             }
         }
 
-        // If no occurrence is found for the rest of the week, check the first occurrence next week
-        if (!schedules.isEmpty()) {
-            nextOccurrence = schedules.get(0);
-        }
+        // If no time was found in the current week, return the first time in the next week
+        WeekDaySchedule firstSchedule = schedules.get(0);
+        TimeRange firstTimeRange = firstSchedule.getDaySchedule().get(0);
 
-        return nextOccurrence;
+        return Date.from(fromDateTime.with(TemporalAdjusters.next(firstSchedule.getDay()))
+                .withHour((firstTimeRange.getStartsAt() / 60)-3) // Formatted to brazilian time zone
+                .withMinute(firstTimeRange.getStartsAt() % 60)
+                .withSecond(0)
+                .withNano(0)
+                .atZone(ZoneId.systemDefault()).toInstant());
     }
 
     /**

@@ -101,7 +101,7 @@ public class TherapyServiceImpl implements TherapyService {
         );
         m.map(therapyUpdate, therapy);
         therapy.setSchedule(therapyUpdate.getSchedule());
-        therapy.setNextSession(getNextOccurence(therapy.getSchedule()));
+        therapy.setNextSession(getNextOccurrence(therapy.getSchedule(), new Date()));
         userService.save(professional);
         save(therapy);
 

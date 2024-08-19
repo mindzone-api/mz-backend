@@ -145,7 +145,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
             therapy.setSince(new Date());
             therapy.setUrl(analysis.getApprovalSessionsUrl());
             therapy.setActive(true);
-            therapy.setNextSession(getNextOccurence(therapy.getSchedule()));
+            therapy.setNextSession(getNextOccurrence(therapy.getSchedule(), new Date()));
             therapy.setCompletedSessions(new ArrayList<>());
             t.save(therapy);
 
