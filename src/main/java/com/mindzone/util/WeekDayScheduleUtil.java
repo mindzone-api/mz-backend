@@ -3,9 +3,11 @@ package com.mindzone.util;
 import com.mindzone.model.user.TimeRange;
 import com.mindzone.model.user.WeekDaySchedule;
 
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class WeekDayScheduleUtil {
@@ -162,44 +164,143 @@ public class WeekDayScheduleUtil {
     }
 
     /**
-     * return the next occurence of a given schedule based on UTC time
-     * @param schedules the schedule to be analysed
-     * @return the next occurence of the given schedule
+     * Returns the next session time as a Date object based on the provided date and time.
+     * The WeekDaySchedule list is expected to be sorted from Monday to Sunday, and within each day, from earlier to later times.
+     *
+     * @param schedules list of WeekDaySchedule containing recurring weekly sessions.
+     * @param fromDate the starting Date from which to search for the next session.
+     * @return a Date object representing the next session time, or null if no upcoming session is found.
      */
-    public static WeekDaySchedule getNextOccurence(List<WeekDaySchedule> schedules) {
-        LocalDateTime now = LocalDateTime.now();
-        DayOfWeek currentDay = now.getDayOfWeek();
-        int currentMinutes = now.toLocalTime().toSecondOfDay() / 60;  // Convert current time to minutes since midnight
+    public static Date getNextOccurrence(List<WeekDaySchedule> schedules, Date fromDate) {
+        // Convert fromDate to LocalDateTime in the local time zone
+        LocalDateTime fromDateTime = LocalDateTime.ofInstant(fromDate.toInstant(), ZoneId.systemDefault());
 
-        WeekDaySchedule nextOccurrence = null;
-
+        // Loop through the schedules to find the next occurrence
         for (WeekDaySchedule schedule : schedules) {
-            DayOfWeek scheduleDay = schedule.getDay();
-
-            // Check if the day is today or a future day in the week
-            if (scheduleDay.getValue() < currentDay.getValue()) {
-                continue;  // Skip past days
-            }
-
+            // Loop through each TimeRange to find the next time
             for (TimeRange timeRange : schedule.getDaySchedule()) {
-                if (scheduleDay.equals(currentDay) && timeRange.getEndsAt() <= currentMinutes) {
-                    continue;  // Skip time ranges that have already ended today
+                // If the current day matches the schedule day
+                if (schedule.getDay().equals(fromDateTime.getDayOfWeek())) {
+                    // If the current time is before the end of the time range, return the next occurrence
+                    if (timeRange.getEndsAt() > fromDateTime.getHour() * 60 + fromDateTime.getMinute()) {
+                        return Date.from(fromDateTime.withHour(timeRange.getStartsAt() / 60)
+                                .withMinute(timeRange.getStartsAt() % 60)
+                                .withSecond(0)
+                                .withNano(0)
+                                .atZone(ZoneId.systemDefault()).toInstant());
+                    }
                 }
-
-                // The first time range that hasn't ended is the next occurrence
-                nextOccurrence = new WeekDaySchedule();
-                nextOccurrence.setDay(scheduleDay);
-                nextOccurrence.setDaySchedule(List.of(timeRange));
-                return nextOccurrence;
+                // If the schedule day is after the current day, find the next day with a scheduled time
+                if (schedule.getDay().getValue() > fromDateTime.getDayOfWeek().getValue()) {
+                    return Date.from(fromDateTime.with(TemporalAdjusters.next(schedule.getDay()))
+                            .withHour(timeRange.getStartsAt() / 60)
+                            .withMinute(timeRange.getStartsAt() % 60)
+                            .withSecond(0)
+                            .withNano(0)
+                            .atZone(ZoneId.systemDefault()).toInstant());
+                }
             }
         }
 
-        // If no occurrence is found for the rest of the week, check the first occurrence next week
-        if (!schedules.isEmpty()) {
-            nextOccurrence = schedules.get(0);
+        // If no time was found in the current week, return the first time in the next week
+        WeekDaySchedule firstSchedule = schedules.get(0);
+        TimeRange firstTimeRange = firstSchedule.getDaySchedule().get(0);
+
+        return Date.from(fromDateTime.with(TemporalAdjusters.next(firstSchedule.getDay()))
+                .withHour((firstTimeRange.getStartsAt() / 60)-3) // Formatted to brazilian time zone
+                .withMinute(firstTimeRange.getStartsAt() % 60)
+                .withSecond(0)
+                .withNano(0)
+                .atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * Merges occurrences from s2 into s1.
+     * If s2 contains intervals that fill gaps or connect adjacent intervals in s1,
+     * they will be merged into a single interval.
+     *
+     * @param s1 schedules to be updated
+     * @param s2 schedules to merge into s1
+     */
+    public static void mergeWith(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2) {
+        for (WeekDaySchedule s2Schedule : s2) {
+            for (WeekDaySchedule s1Schedule : s1) {
+                if (s1Schedule.getDay().equals(s2Schedule.getDay())) {
+                    List<TimeRange> mergedRanges = new ArrayList<>();
+                    List<TimeRange> s1Ranges = s1Schedule.getDaySchedule();
+                    List<TimeRange> s2Ranges = s2Schedule.getDaySchedule();
+
+                    mergeIterator(mergedRanges, s1Ranges, s2Ranges);
+
+                    // Replace the old schedule with the merged one
+                    s1Schedule.setDaySchedule(mergedRanges);
+                }
+            }
+        }
+    }
+
+    /**
+     * Merges occurrences from s2 into s1, constrained by the limits specified in limit.
+     * If s2 contains intervals that can be merged with s1, the merge will be restricted by the intervals in limit.
+     *
+     * @param s1    schedules to be updated
+     * @param s2    schedules to merge into s1
+     * @param limit schedules that define the maximum allowable range for merging
+     */
+    public static void mergeWith(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2, List<WeekDaySchedule> limit) {
+        for (WeekDaySchedule s2Schedule : s2) {
+            for (WeekDaySchedule s1Schedule : s1) {
+                if (s1Schedule.getDay().equals(s2Schedule.getDay())) {
+                    List<TimeRange> mergedRanges = new ArrayList<>();
+                    List<TimeRange> s1Ranges = s1Schedule.getDaySchedule();
+                    List<TimeRange> s2Ranges = s2Schedule.getDaySchedule();
+                    List<TimeRange> limitRanges = limit.stream()
+                            .filter(l -> l.getDay().equals(s1Schedule.getDay()))
+                            .findFirst()
+                            .map(WeekDaySchedule::getDaySchedule)
+                            .orElse(Collections.emptyList());
+
+                    mergeIterator(mergedRanges, s1Ranges, s2Ranges);
+
+                    // Apply limit constraints
+                    List<TimeRange> constrainedRanges = new ArrayList<>();
+                    for (TimeRange merged : mergedRanges) {
+                        for (TimeRange lim : limitRanges) {
+                            if (merged.getEndsAt() > lim.getStartsAt() && merged.getStartsAt() < lim.getEndsAt()) {
+                                constrainedRanges.add(new TimeRange(
+                                        Math.max(merged.getStartsAt(), lim.getStartsAt()),
+                                        Math.min(merged.getEndsAt(), lim.getEndsAt())
+                                ));
+                            }
+                        }
+                    }
+
+                    // Replace the old schedule with the constrained one
+                    s1Schedule.setDaySchedule(constrainedRanges);
+                }
+            }
         }
 
-        return nextOccurrence;
+    }
+
+    private static void mergeIterator(List<TimeRange> mergedRanges, List<TimeRange> s1Ranges, List<TimeRange> s2Ranges) {
+        int i = 0, j = 0;
+        while (i < s1Ranges.size() || j < s2Ranges.size()) {
+            TimeRange current;
+            if (i < s1Ranges.size() && (j >= s2Ranges.size() || s1Ranges.get(i).getStartsAt() <= s2Ranges.get(j).getStartsAt())) {
+                current = s1Ranges.get(i++);
+            } else {
+                current = s2Ranges.get(j++);
+            }
+
+            if (!mergedRanges.isEmpty() && mergedRanges.get(mergedRanges.size() - 1).getEndsAt() >= current.getStartsAt()) {
+                // Merge overlapping or adjacent ranges
+                mergedRanges.get(mergedRanges.size() - 1)
+                        .setEndsAt(Math.max(mergedRanges.get(mergedRanges.size() - 1).getEndsAt(), current.getEndsAt()));
+            } else {
+                mergedRanges.add(current);
+            }
+        }
     }
 }
 

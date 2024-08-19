@@ -55,4 +55,16 @@ public class MailsBody {
                         "to this professional schedule conflict. Try again with its updated availability!"
         );
     }
+
+    public static MailDTO therapyUpdateMail(
+            String patientMail,
+            String professionalName
+    ) {
+        return new MailDTO(
+                patientMail,
+                "your therapy with " + professionalName + "has been updated",
+                professionalName + " has updated informations about your therapy, go to " + MINDZONE_HOMEPAGE + "" +
+                        "to see more details about it."
+        );
+    }
 }

@@ -1,11 +1,8 @@
 package com.mindzone.controller;
 
-import com.mindzone.dto.request.TherapyRequest;
-import com.mindzone.dto.request.TherapyRequestAnalysis;
+import com.mindzone.dto.request.TherapyUpdate;
 import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.dto.response.listed.ListedTherapy;
-import com.mindzone.enums.Role;
-import com.mindzone.enums.TherapyStatus;
 import com.mindzone.model.user.User;
 import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
@@ -17,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.mindzone.constants.Constants.V1;
+import static com.mindzone.enums.Role.PROFESSIONAL;
 
 @RestController
 @AllArgsConstructor
@@ -25,12 +23,6 @@ public class TherapyController {
 
     private UserService userService;
     private TherapyService therapyService;
-
-    @PostMapping("/request")
-    public ResponseEntity<TherapyResponse> requestTherapy(JwtAuthenticationToken token, @RequestBody TherapyRequest therapyRequest) {
-        User patient = userService.validateUser(token, Role.PATIENT);
-        return ResponseEntity.ok(therapyService.requestTherapy(therapyRequest, patient));
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<TherapyResponse> get(JwtAuthenticationToken token, @PathVariable String id) {
@@ -45,24 +37,12 @@ public class TherapyController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TherapyResponse> updateRequest(
+    public ResponseEntity<TherapyResponse> update(
             JwtAuthenticationToken token,
             @PathVariable String id,
-            @RequestBody TherapyRequest therapyRequest
+            @RequestBody TherapyUpdate therapyUpdate
     ) {
-        User patient = userService.validateUser(token, Role.PATIENT);
-        return ResponseEntity.ok(therapyService.updateRequest(patient, id, therapyRequest));
+        User professional = userService.validateUser(token, PROFESSIONAL);
+        return ResponseEntity.ok(therapyService.update(professional, id, therapyUpdate));
     }
-
-    @PutMapping("/analyse/{id}")
-    public ResponseEntity<TherapyResponse> analyseRequest(
-            JwtAuthenticationToken token,
-            @PathVariable String id,
-            @RequestBody TherapyRequestAnalysis analysis
-            ) {
-        User professional = userService.validateUser(token, Role.PROFESSIONAL);
-        return ResponseEntity.ok(therapyService.analyseRequest(professional, id, analysis));
-    }
-
-
 }

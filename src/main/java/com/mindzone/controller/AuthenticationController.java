@@ -7,9 +7,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 
 import static com.mindzone.constants.Constants.*;
+import static org.springframework.http.HttpMethod.POST;
 
 @RestController
 @RequestMapping(V1 + "/auth")
@@ -26,7 +26,7 @@ public class AuthenticationController {
                 authCodeRequest.getCode(), CLIENT_ID, CLIENT_SECRET, "your-redirect-uri");
 
         HttpEntity<String> request = new HttpEntity<>(body, headers);
-        ResponseEntity<String> response = restTemplate.exchange(TOKEN_URL, HttpMethod.POST, request, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(TOKEN_URL, POST, request, String.class);
 
 
         return ResponseEntity.ok(response.getBody());

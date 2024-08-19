@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = "therapy")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -21,7 +20,7 @@ public class Session extends AbstractModel implements Serializable {
 
     private String observations;
     private Role createdBy;
-    private Date endedAt;
+    private Date date;
     private Double patientMood;
     private Homework currentHomeworkState;
     private List<File> attatchments;

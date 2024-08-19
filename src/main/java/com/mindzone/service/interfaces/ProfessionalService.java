@@ -1,5 +1,6 @@
 package com.mindzone.service.interfaces;
 
+import com.mindzone.dto.request.UserRequest;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.dto.response.listed.ListedPatient;
 import com.mindzone.model.user.User;
@@ -14,5 +15,5 @@ public interface ProfessionalService {
 
     List<ListedAlly> getMyAllies(User user);
 
-    UserResponse updateAvailability(User user, List<WeekDaySchedule> schedule);
+    UserResponse update(User professional, UserRequest request);
 }

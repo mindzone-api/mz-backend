@@ -1,11 +1,13 @@
 package com.mindzone.service.impl;
 
+import com.mindzone.dto.request.UserRequest;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.dto.response.listed.ListedPatient;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import com.mindzone.model.user.WeekDaySchedule;
 import com.mindzone.repository.TherapyRepository;
+import com.mindzone.service.interfaces.MailService;
 import com.mindzone.service.interfaces.ProfessionalService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
@@ -15,7 +17,10 @@ import com.mindzone.dto.response.listed.ListedAlly;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mindzone.constants.MailsBody.canceledTherapyRequestMail;
 import static com.mindzone.enums.TherapyStatus.*;
+import static com.mindzone.util.WeekDayScheduleUtil.fitsIn;
+import static com.mindzone.util.WeekDayScheduleUtil.removeFrom;
 
 @Service
 @AllArgsConstructor
@@ -23,6 +28,7 @@ public class ProfessionalServiceImpl implements ProfessionalService {
 
     private TherapyRepository therapyRepository;
     private UltimateModelMapper m;
+    private MailService mailService;
     private UserService userService;
     @Override
     public List<ListedPatient> getMyPatients(User user) {
@@ -58,9 +64,41 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     }
 
     @Override
-    public UserResponse updateAvailability(User user, List<WeekDaySchedule> schedule) {
-        user.getProfessionalInfo().setAvailability(schedule);
-        userService.save(user);
-        return m.map(user, UserResponse.class);
+    public UserResponse update(User professional, UserRequest request) {
+        m.map(request, professional);
+        updateProfessionalAvailability(professional);
+        userService.save(professional);
+        return m.map(professional, UserResponse.class);
+    }
+
+    private void updateProfessionalAvailability(User professional) {
+        professional.getProfessionalInfo().setAvailability(
+                userService.getAgendaCopy(
+                        professional.getProfessionalInfo().getAgenda()
+                )
+        );
+        List<WeekDaySchedule> availability = professional.getProfessionalInfo().getAvailability();
+
+        // removing active therapies schedule from the professional's new availability
+        List<Therapy> activeTherapies = therapyRepository.findAllByProfessionalIdAndActiveIsTrue(professional.getId());
+        for (Therapy activeTherapy : activeTherapies) {
+            if (fitsIn(availability, activeTherapy.getSchedule())) {
+                removeFrom(availability, activeTherapy.getSchedule());
+            }
+        }
+
+        // Canceling all pending requests that does not fit in the professional's new agenda
+        List<Therapy> pendingTherapies = therapyRepository.findAllByProfessionalIdAndTherapyStatus(professional.getId(), PENDING);
+        for (Therapy pendingTherapy : pendingTherapies) {
+            if (!fitsIn(availability, pendingTherapy.getSchedule())) {
+                User patientNotified = userService.getById(pendingTherapy.getPatientId());
+                pendingTherapy.setTherapyStatus(CANCELED);
+                therapyRepository.save(pendingTherapy);
+                // notify patient about this occurence
+                mailService.sendMail(canceledTherapyRequestMail(patientNotified.getEmail(), professional.getName()));
+            }
+        }
+
+        professional.getProfessionalInfo().setAvailability(availability);
     }
 }

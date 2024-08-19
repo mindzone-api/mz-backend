@@ -18,7 +18,6 @@ public class Constants {
     public static final String CLIENT_ID = System.getenv("GOOGLE_CLIENT_ID");
     public static final String CLIENT_SECRET = System.getenv("GOOGLE_CLIENT_SECRET");
     public static final String[] WHITELIST_ENDPOINTS = {
-            V1 + "/user/signup",
             V1 + "/payment/**",
             "/error",
             "/v2/api-docs",
