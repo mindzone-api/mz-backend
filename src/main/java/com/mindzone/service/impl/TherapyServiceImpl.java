@@ -92,16 +92,16 @@ public class TherapyServiceImpl implements TherapyService {
     public TherapyResponse update(User professional, String id, TherapyUpdate therapyUpdate) {
         Therapy therapy = getById(id);
         canManage(professional, therapy);
-        professional.getProfessionalInfo().setAvailability(
-                updateProfessionalSchedule(
-                        professional,
-                        therapy.getSchedule(),
-                        therapyUpdate.getSchedule()
-                )
-        );
+        if (!therapyUpdate.getSchedule().equals(therapy.getSchedule())) {
+            professional.getProfessionalInfo().setAvailability(
+                    updateProfessionalSchedule(
+                            professional,
+                            therapy.getSchedule(),
+                            therapyUpdate.getSchedule()
+                    )
+            );
+        }
         m.map(therapyUpdate, therapy);
-        therapy.setSchedule(therapyUpdate.getSchedule());
-        therapy.setNextSession(getNextOccurrence(therapy.getSchedule(), new Date()));
         userService.save(professional);
         save(therapy);
 
@@ -117,18 +117,20 @@ public class TherapyServiceImpl implements TherapyService {
         List<WeekDaySchedule> agenda = professional.getProfessionalInfo().getAgenda();
         List<WeekDaySchedule> availability = professional.getProfessionalInfo().getAvailability();
 
-        if (fitsIn(availability, newTherapySchedule)) {
-            removeFrom(availability, newTherapySchedule);
-        } else if (fitsIn(agenda, newTherapySchedule)) {
-            throw new ApiRequestException(THERAPY_TIME_CONFLICT);
-        } else if (overlaps(availability, newTherapySchedule)) {
-            removeFrom(availability, newTherapySchedule);
-        }
-
         if (fitsIn(agenda, oldTherapySchedule)) {
             mergeWith(availability, oldTherapySchedule);
         } else if (overlaps(agenda, oldTherapySchedule)) {
             mergeWith(availability, oldTherapySchedule, agenda);
+        }
+
+        if (fitsIn(availability, newTherapySchedule)) {
+            removeFrom(availability, newTherapySchedule);
+        } else if (fitsIn(agenda, newTherapySchedule)) {
+            // undo the old schedule removal to throw an exception
+            removeFrom(availability, oldTherapySchedule);
+            throw new ApiRequestException(THERAPY_TIME_CONFLICT);
+        } else if (overlaps(availability, newTherapySchedule)) {
+            removeFrom(availability, newTherapySchedule);
         }
         return availability;
     }
