@@ -6,6 +6,8 @@ import java.util.Date;
 
 public class DateUtil {
 
+    public final static long MILLIS_IN_A_DAY = 24 * 60 * 60 * 1000L;
+
     /**
      * Calculates the minimum birth date (from that date until today)
      * possible from the age informed

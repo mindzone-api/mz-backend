@@ -1,14 +1,22 @@
 package com.mindzone.dto.request;
 
+import com.mindzone.enums.HealthPlan;
+import com.mindzone.enums.PaymentMethod;
+import com.mindzone.enums.TherapyModality;
+import com.mindzone.model.user.WeekDaySchedule;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class TherapyRequest extends TherapyToValidate {
+public class TherapyRequest  {
+    private TherapyModality therapyModality;
+    private PaymentMethod paymentMethod;
+    private HealthPlan healthPlan;
+    private List<WeekDaySchedule> schedule;
     private String professionalId;
 }

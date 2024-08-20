@@ -17,6 +17,7 @@ public class ExceptionMessages {
     public static final String THERAPY_TIME_CONFLICT = "THERAPY_TIME_CONFLICT";
     public static final String THERAPY_NOT_FOUND = "THERAPY_NOT_FOUND";
     public static final String THERAPY_IS_NOT_EDITABLE = "THERAPY_IS_NOT_EDITABLE";
+    public static final String UPDATE_NEEDS_24_HOURS_DIFFERENCE = "UPDATE_NEEDS_24_HOURS_DIFFERENCE";
 
 
 

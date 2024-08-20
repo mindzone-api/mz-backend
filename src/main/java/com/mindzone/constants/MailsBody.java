@@ -63,7 +63,7 @@ public class MailsBody {
         return new MailDTO(
                 patientMail,
                 "your therapy with " + professionalName + "has been updated",
-                professionalName + " has updated informations about your therapy, go to " + MINDZONE_HOMEPAGE + "" +
+                professionalName + " has updated informations about your therapy, go to " + MINDZONE_HOMEPAGE +
                         "to see more details about it."
         );
     }
