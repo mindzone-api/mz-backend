@@ -1,6 +1,6 @@
 package com.mindzone.controller;
 
-import com.mindzone.dto.request.PageRequest;
+import com.mindzone.dto.request.MzPageRequest;
 import com.mindzone.dto.response.listed.ListedSession;
 import com.mindzone.model.user.User;
 import com.mindzone.service.interfaces.SessionService;
@@ -15,7 +15,7 @@ import static com.mindzone.constants.Constants.V1;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(V1 + "/sesions")
+@RequestMapping(V1 + "/sessions")
 public class SessionController {
 
     private UserService userService;
@@ -25,10 +25,10 @@ public class SessionController {
     public ResponseEntity<Page<ListedSession>> getAll(
             JwtAuthenticationToken token,
             @PathVariable String therapyId,
-            @RequestBody PageRequest pageRequest
+            @RequestBody MzPageRequest mzPageRequest
             ) {
         User user = userService.validateUser(token);
-        return ResponseEntity.ok(sessionService.getAll(user, therapyId, pageRequest));
+        return ResponseEntity.ok(sessionService.getAll(user, therapyId, mzPageRequest));
     }
 
 }

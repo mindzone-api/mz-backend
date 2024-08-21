@@ -172,8 +172,8 @@ public class WeekDayScheduleUtil {
      * @return a Date object representing the next session time, or null if no upcoming session is found.
      */
     public static Date getNextOccurrence(List<WeekDaySchedule> schedules, Date fromDate) {
-        // Convert fromDate to LocalDateTime in the local time zone
-        LocalDateTime fromDateTime = LocalDateTime.ofInstant(fromDate.toInstant(), ZoneId.systemDefault());
+        // Convert fromDate to LocalDateTime in UTC
+        LocalDateTime fromDateTime = LocalDateTime.ofInstant(fromDate.toInstant(), ZoneOffset.UTC);
 
         // Loop through the schedules to find the next occurrence
         for (WeekDaySchedule schedule : schedules) {
@@ -182,12 +182,12 @@ public class WeekDayScheduleUtil {
                 // If the current day matches the schedule day
                 if (schedule.getDay().equals(fromDateTime.getDayOfWeek())) {
                     // If the current time is before the end of the time range, return the next occurrence
-                    if (timeRange.getEndsAt() > fromDateTime.getHour() * 60 + fromDateTime.getMinute()) {
+                    if (timeRange.getStartsAt() > fromDateTime.getHour() * 60 + fromDateTime.getMinute()) {
                         return Date.from(fromDateTime.withHour(timeRange.getStartsAt() / 60)
                                 .withMinute(timeRange.getStartsAt() % 60)
                                 .withSecond(0)
                                 .withNano(0)
-                                .atZone(ZoneId.systemDefault()).toInstant());
+                                .atZone(ZoneOffset.UTC).toInstant());
                     }
                 }
                 // If the schedule day is after the current day, find the next day with a scheduled time
@@ -197,7 +197,7 @@ public class WeekDayScheduleUtil {
                             .withMinute(timeRange.getStartsAt() % 60)
                             .withSecond(0)
                             .withNano(0)
-                            .atZone(ZoneId.systemDefault()).toInstant());
+                            .atZone(ZoneOffset.UTC).toInstant());
                 }
             }
         }
@@ -207,12 +207,13 @@ public class WeekDayScheduleUtil {
         TimeRange firstTimeRange = firstSchedule.getDaySchedule().get(0);
 
         return Date.from(fromDateTime.with(TemporalAdjusters.next(firstSchedule.getDay()))
-                .withHour((firstTimeRange.getStartsAt() / 60)-3) // Formatted to brazilian time zone
+                .withHour(firstTimeRange.getStartsAt() / 60)
                 .withMinute(firstTimeRange.getStartsAt() % 60)
                 .withSecond(0)
                 .withNano(0)
-                .atZone(ZoneId.systemDefault()).toInstant());
+                .atZone(ZoneOffset.UTC).toInstant());
     }
+
 
     /**
      * Merges occurrences from s2 into s1.

@@ -4,6 +4,7 @@ import com.mindzone.dto.request.TherapyRequest;
 import com.mindzone.dto.request.TherapyRequestAnalysis;
 import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.exception.ApiRequestException;
+import com.mindzone.model.therapy.Session;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.ProfessionalInfo;
 import com.mindzone.model.user.User;
@@ -22,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 import static com.mindzone.constants.MailsBody.*;
-import static com.mindzone.enums.TherapyModality.ONLINE;
 import static com.mindzone.enums.TherapyStatus.*;
 import static com.mindzone.exception.ExceptionMessages.*;
 import static com.mindzone.util.WeekDayScheduleUtil.*;
@@ -145,8 +145,8 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
             therapy.setSince(new Date());
             therapy.setUrl(analysis.getApprovalSessionsUrl());
             therapy.setActive(true);
-            therapy.setNextSession(getNextOccurrence(therapy.getSchedule(), new Date()));
-            therapy.setCompletedSessions(new ArrayList<>());
+            therapy.setNextSession(new Session(getNextOccurrence(therapy.getSchedule(), new Date())));
+            therapy.setSessions(new ArrayList<>());
             t.save(therapy);
 
             // notify patient about professional final analysis

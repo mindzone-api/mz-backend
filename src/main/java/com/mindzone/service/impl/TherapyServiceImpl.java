@@ -4,6 +4,7 @@ import com.mindzone.dto.request.TherapyUpdate;
 import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.dto.response.listed.ListedTherapy;
 import com.mindzone.exception.ApiRequestException;
+import com.mindzone.model.therapy.Session;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import com.mindzone.model.user.WeekDaySchedule;
@@ -20,6 +21,7 @@ import java.util.List;
 import static com.mindzone.constants.MailsBody.therapyUpdateMail;
 import static com.mindzone.enums.Role.PATIENT;
 import static com.mindzone.enums.Role.PROFESSIONAL;
+import static com.mindzone.enums.TherapyStatus.APPROVED;
 import static com.mindzone.exception.ExceptionMessages.*;
 import static com.mindzone.util.DateUtil.MILLIS_IN_A_DAY;
 import static com.mindzone.util.WeekDayScheduleUtil.*;
@@ -33,23 +35,26 @@ public class TherapyServiceImpl implements TherapyService {
     private UltimateModelMapper m;
     private MailService mailService;
 
+    @Override
     public void save(Therapy therapy) {
         therapy.setUpdatedAt(new Date());
         therapyRepository.save(therapy);
     }
 
+    @Override
     public Therapy getById(String id) {
         return therapyRepository.findById(id)
                 .orElseThrow(() -> new ApiRequestException(THERAPY_NOT_FOUND));
     }
 
+    @Override
     public void canAccess(User user, Therapy therapy) {
         if (user.getRole() == PATIENT) {
             if (!therapy.getPatientId().equals(user.getId())) {
                 throw new ApiRequestException(USER_UNAUTHORIZED);
             }
         } else if (user.getRole() == PROFESSIONAL) {
-            List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndActiveIsTrue(therapy.getPatientId());
+            List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndTherapyStatus(therapy.getPatientId(), APPROVED);
             List<Therapy> patientTherapiesWithLoggedProfessional = patientTherapies.stream().filter(t -> t.getProfessionalId().equals(user.getId())).toList();
             if (patientTherapiesWithLoggedProfessional.isEmpty()) {
                 throw new ApiRequestException(USER_UNAUTHORIZED);
@@ -57,11 +62,19 @@ public class TherapyServiceImpl implements TherapyService {
         }
     }
 
+    @Override
     public void canManage(User user, Therapy therapy) {
         if (user.getRole() == PATIENT && !therapy.getPatientId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         } else if (user.getRole() == PROFESSIONAL && !therapy.getProfessionalId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
+        }
+    }
+
+    @Override
+    public void isApproved(Therapy therapy) {
+        if (!therapy.getActive()) {
+            throw new ApiRequestException(THERAPY_IS_NOT_APPROVED);
         }
     }
 
@@ -94,7 +107,7 @@ public class TherapyServiceImpl implements TherapyService {
                     )
             );
         }
-        if (!therapy.getNextSession().equals(therapyUpdate.getNextSession())) {
+        if (!therapy.getNextSession().getDate().equals(therapyUpdate.getNextSession())) {
             validateNextSession(therapyUpdate.getNextSession());
         }
         m.map(therapyUpdate, therapy);

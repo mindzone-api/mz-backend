@@ -14,6 +14,9 @@ public interface TherapyService {
     Therapy getById(String id);
     void canAccess(User user, Therapy therapy);
     void canManage(User user, Therapy therapy);
+
+    void isApproved(Therapy therapy);
+
     TherapyResponse get(User user, String id);
     List<ListedTherapy> getAll(User user);
     TherapyResponse update(User professional, String id, TherapyUpdate therapyUpdate);
