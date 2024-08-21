@@ -5,10 +5,7 @@ import com.mindzone.model.user.WeekDaySchedule;
 
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class WeekDayScheduleUtil {
 
@@ -106,62 +103,45 @@ public class WeekDayScheduleUtil {
      *
      * @param s1 schedules to be updated
      * @param s2 schedules to remove from s1
-     * @return the final s1 list without s2 occurrences
      */
-     public static List<WeekDaySchedule> removeFrom(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2) {
-        for (WeekDaySchedule daySchedule2 : s2) {
-            DayOfWeek day2 = daySchedule2.getDay();
-            WeekDaySchedule daySchedule1 = s1.stream()
-                    .filter(ds -> ds.getDay().equals(day2))
-                    .findFirst()
-                    .orElse(null);
+    public static void removeFrom(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2) {
+        Iterator<WeekDaySchedule> s1Iterator = s1.iterator();
 
-            if (daySchedule1 != null) {
-                List<TimeRange> timeRanges1 = daySchedule1.getDaySchedule();
-                List<TimeRange> timeRanges2 = daySchedule2.getDaySchedule();
+        while (s1Iterator.hasNext()) {
+            WeekDaySchedule schedule1 = s1Iterator.next();
+            List<TimeRange> updatedRanges = new ArrayList<>(schedule1.getDaySchedule());
 
-                List<TimeRange> newTimeRanges = new ArrayList<>();
+            for (WeekDaySchedule schedule2 : s2) {
+                if (schedule1.getDay().equals(schedule2.getDay())) {
+                    for (TimeRange range2 : schedule2.getDaySchedule()) {
+                        List<TimeRange> tempRanges = new ArrayList<>();
 
-                for (TimeRange range1 : timeRanges1) {
-                    boolean hasOverlap = false;
-                    for (TimeRange range2 : timeRanges2) {
-                        // Case 1: range2 completely inside range1
-                        if (range2.getStartsAt() > range1.getStartsAt() && range2.getEndsAt() < range1.getEndsAt()) {
-                            newTimeRanges.add(new TimeRange(range1.getStartsAt(), range2.getStartsAt()));
-                            newTimeRanges.add(new TimeRange(range2.getEndsAt(), range1.getEndsAt()));
-                            hasOverlap = true;
-                            break;
+                        for (TimeRange range1 : updatedRanges) {
+                            if (range2.getEndsAt() <= range1.getStartsAt() || range2.getStartsAt() >= range1.getEndsAt()) {
+                                tempRanges.add(range1);
+                            } else {
+                                if (range2.getStartsAt() > range1.getStartsAt()) {
+                                    tempRanges.add(new TimeRange(range1.getStartsAt(), range2.getStartsAt()));
+                                }
+                                if (range2.getEndsAt() < range1.getEndsAt()) {
+                                    tempRanges.add(new TimeRange(range2.getEndsAt(), range1.getEndsAt()));
+                                }
+                            }
                         }
-                        // Case 2: range2 equals range1 or partially overlaps the start or end of range1
-                        else if (range2.getStartsAt().equals(range1.getStartsAt()) && range2.getEndsAt().equals(range1.getEndsAt())) {
-                            hasOverlap = true;
-                            break;
-                        } else if (range2.getStartsAt().equals(range1.getStartsAt()) && range2.getEndsAt() < range1.getEndsAt()) {
-                            newTimeRanges.add(new TimeRange(range2.getEndsAt(), range1.getEndsAt()));
-                            hasOverlap = true;
-                            break;
-                        } else if (range2.getEndsAt().equals(range1.getEndsAt()) && range2.getStartsAt() > range1.getStartsAt()) {
-                            newTimeRanges.add(new TimeRange(range1.getStartsAt(), range2.getStartsAt()));
-                            hasOverlap = true;
-                            break;
-                        }
+                        updatedRanges = tempRanges;
                     }
-                    // If no overlap was found, keep the original range
-                    if (!hasOverlap) {
-                        newTimeRanges.add(range1);
-                    }
-                }
-
-                if (newTimeRanges.isEmpty()) {
-                    s1.remove(daySchedule1);
-                } else {
-                    daySchedule1.setDaySchedule(newTimeRanges);
                 }
             }
-        }
 
-        return s1;
+            if (updatedRanges.isEmpty()) {
+                s1Iterator.remove();
+            } else {
+                schedule1.setDaySchedule(updatedRanges);
+            }
+        }
     }
+
+
 
     /**
      * Returns the next session time as a Date object based on the provided date and time.
@@ -216,92 +196,141 @@ public class WeekDayScheduleUtil {
 
 
     /**
-     * Merges occurrences from s2 into s1.
-     * If s2 contains intervals that fill gaps or connect adjacent intervals in s1,
-     * they will be merged into a single interval.
-     *
-     * @param s1 schedules to be updated
-     * @param s2 schedules to merge into s1
+     * Merges schedules from s2 into s1.
+     * @param s1 The schedules to be updated
+     * @param s2 The schedules to merge into s1
      */
     public static void mergeWith(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2) {
-        for (WeekDaySchedule s2Schedule : s2) {
-            for (WeekDaySchedule s1Schedule : s1) {
-                if (s1Schedule.getDay().equals(s2Schedule.getDay())) {
-                    List<TimeRange> mergedRanges = new ArrayList<>();
-                    List<TimeRange> s1Ranges = s1Schedule.getDaySchedule();
-                    List<TimeRange> s2Ranges = s2Schedule.getDaySchedule();
+        Map<DayOfWeek, List<TimeRange>> mergedSchedules = new LinkedHashMap<>();
 
-                    mergeIterator(mergedRanges, s1Ranges, s2Ranges);
+        // Add all schedules from s1 to the map
+        addSchedulesToMap(s1, mergedSchedules);
 
-                    // Replace the old schedule with the merged one
-                    s1Schedule.setDaySchedule(mergedRanges);
-                }
-            }
-        }
+        // Merge schedules from s2 into the schedules from s1
+        mergeSchedules(s2, mergedSchedules);
+
+        // Update the list s1 with the merged schedules, preserving the order
+        updateScheduleList(s1, mergedSchedules);
     }
 
     /**
-     * Merges occurrences from s2 into s1, constrained by the limits specified in limit.
-     * If s2 contains intervals that can be merged with s1, the merge will be restricted by the intervals in limit.
-     *
-     * @param s1    schedules to be updated
-     * @param s2    schedules to merge into s1
-     * @param limit schedules that define the maximum allowable range for merging
+     * Merges schedules from s2 into s1 with respect to the limit.
+     * @param s1 The schedules to be updated
+     * @param s2 The schedules to merge into s1
+     * @param limit The list of schedules that limit the addition from s2
      */
     public static void mergeWith(List<WeekDaySchedule> s1, List<WeekDaySchedule> s2, List<WeekDaySchedule> limit) {
-        for (WeekDaySchedule s2Schedule : s2) {
-            for (WeekDaySchedule s1Schedule : s1) {
-                if (s1Schedule.getDay().equals(s2Schedule.getDay())) {
-                    List<TimeRange> mergedRanges = new ArrayList<>();
-                    List<TimeRange> s1Ranges = s1Schedule.getDaySchedule();
-                    List<TimeRange> s2Ranges = s2Schedule.getDaySchedule();
-                    List<TimeRange> limitRanges = limit.stream()
-                            .filter(l -> l.getDay().equals(s1Schedule.getDay()))
-                            .findFirst()
-                            .map(WeekDaySchedule::getDaySchedule)
-                            .orElse(Collections.emptyList());
+        Map<DayOfWeek, List<TimeRange>> mergedSchedules = new LinkedHashMap<>();
 
-                    mergeIterator(mergedRanges, s1Ranges, s2Ranges);
+        // Add all schedules from s1 to the map
+        addSchedulesToMap(s1, mergedSchedules);
 
-                    // Apply limit constraints
-                    List<TimeRange> constrainedRanges = new ArrayList<>();
-                    for (TimeRange merged : mergedRanges) {
-                        for (TimeRange lim : limitRanges) {
-                            if (merged.getEndsAt() > lim.getStartsAt() && merged.getStartsAt() < lim.getEndsAt()) {
-                                constrainedRanges.add(new TimeRange(
-                                        Math.max(merged.getStartsAt(), lim.getStartsAt()),
-                                        Math.min(merged.getEndsAt(), lim.getEndsAt())
-                                ));
-                            }
-                        }
+        // Merge schedules from s2 into the schedules from s1, respecting the limit
+        mergeSchedulesWithLimit(s2, mergedSchedules, limit);
+
+        // Update the list s1 with the merged schedules, preserving the order
+        updateScheduleList(s1, mergedSchedules);
+    }
+
+    private static void addSchedulesToMap(List<WeekDaySchedule> schedules, Map<DayOfWeek, List<TimeRange>> map) {
+        for (WeekDaySchedule schedule : schedules) {
+            map.putIfAbsent(schedule.getDay(), new ArrayList<>());
+            map.get(schedule.getDay()).addAll(schedule.getDaySchedule());
+        }
+    }
+
+    private static void updateScheduleList(List<WeekDaySchedule> list, Map<DayOfWeek, List<TimeRange>> map) {
+        list.clear();
+        // Iterate in the order of DayOfWeek enum (Monday to Sunday)
+        for (DayOfWeek day : DayOfWeek.values()) {
+            List<TimeRange> timeRanges = map.get(day);
+            if (timeRanges != null && !timeRanges.isEmpty()) {
+                WeekDaySchedule ws = new WeekDaySchedule();
+                ws.setDay(day);
+                ws.setDaySchedule(timeRanges);
+                list.add(ws);
+            }
+        }
+    }
+
+    private static void mergeSchedules(List<WeekDaySchedule> s2, Map<DayOfWeek, List<TimeRange>> mergedSchedules) {
+        for (WeekDaySchedule schedule : s2) {
+            List<TimeRange> currentSchedules = mergedSchedules.getOrDefault(schedule.getDay(), new ArrayList<>());
+
+            for (TimeRange newRange : schedule.getDaySchedule()) {
+                currentSchedules = mergeTimeRanges(currentSchedules, newRange);
+            }
+
+            mergedSchedules.put(schedule.getDay(), currentSchedules);
+        }
+    }
+
+    private static void mergeSchedulesWithLimit(List<WeekDaySchedule> s2, Map<DayOfWeek, List<TimeRange>> mergedSchedules, List<WeekDaySchedule> limit) {
+        for (WeekDaySchedule schedule : s2) {
+            List<TimeRange> currentSchedules = mergedSchedules.getOrDefault(schedule.getDay(), new ArrayList<>());
+
+            for (TimeRange newRange : schedule.getDaySchedule()) {
+                List<TimeRange> updatedSchedules = mergeTimeRanges(currentSchedules, newRange);
+                if (!updatedSchedules.isEmpty()) {
+                    TimeRange limitedRange = getLimitedRange(updatedSchedules.get(updatedSchedules.size() - 1), limit, schedule.getDay());
+                    if (limitedRange != null) {
+                        updatedSchedules.set(updatedSchedules.size() - 1, limitedRange);
                     }
+                }
+                currentSchedules = updatedSchedules;
+            }
 
-                    // Replace the old schedule with the constrained one
-                    s1Schedule.setDaySchedule(constrainedRanges);
+            mergedSchedules.put(schedule.getDay(), currentSchedules);
+        }
+    }
+
+    private static List<TimeRange> mergeTimeRanges(List<TimeRange> existingRanges, TimeRange newRange) {
+        List<TimeRange> updatedSchedules = new ArrayList<>();
+        boolean merged = false;
+
+        for (TimeRange existingRange : existingRanges) {
+            if (newRange.getEndsAt() < existingRange.getStartsAt() || newRange.getStartsAt() > existingRange.getEndsAt()) {
+                // No overlap: keep the original range
+                updatedSchedules.add(existingRange);
+            } else {
+                // Overlap detected: merge intervals
+                newRange = new TimeRange(
+                        Math.min(newRange.getStartsAt(), existingRange.getStartsAt()),
+                        Math.max(newRange.getEndsAt(), existingRange.getEndsAt())
+                );
+                merged = true;
+            }
+        }
+
+        if (merged) {
+            // Add the merged range
+            updatedSchedules.add(newRange);
+        } else {
+            // Add the new range
+            updatedSchedules.add(newRange);
+        }
+
+        return updatedSchedules;
+    }
+
+    private static TimeRange getLimitedRange(TimeRange range, List<WeekDaySchedule> limit, DayOfWeek day) {
+        for (WeekDaySchedule limitSchedule : limit) {
+            if (limitSchedule.getDay().equals(day)) {
+                for (TimeRange limitRange : limitSchedule.getDaySchedule()) {
+                    if (range.getEndsAt() <= limitRange.getStartsAt() || range.getStartsAt() >= limitRange.getEndsAt()) {
+                        // No overlap with the limit range
+                        continue;
+                    }
+                    // Calculate the limited range
+                    int newStart = Math.max(range.getStartsAt(), limitRange.getStartsAt());
+                    int newEnd = Math.min(range.getEndsAt(), limitRange.getEndsAt());
+                    if (newStart < newEnd) {
+                        return new TimeRange(newStart, newEnd);
+                    }
                 }
             }
         }
-
-    }
-
-    private static void mergeIterator(List<TimeRange> mergedRanges, List<TimeRange> s1Ranges, List<TimeRange> s2Ranges) {
-        int i = 0, j = 0;
-        while (i < s1Ranges.size() || j < s2Ranges.size()) {
-            TimeRange current;
-            if (i < s1Ranges.size() && (j >= s2Ranges.size() || s1Ranges.get(i).getStartsAt() <= s2Ranges.get(j).getStartsAt())) {
-                current = s1Ranges.get(i++);
-            } else {
-                current = s2Ranges.get(j++);
-            }
-
-            if (!mergedRanges.isEmpty() && mergedRanges.get(mergedRanges.size() - 1).getEndsAt() >= current.getStartsAt()) {
-                // Merge overlapping or adjacent ranges
-                mergedRanges.get(mergedRanges.size() - 1)
-                        .setEndsAt(Math.max(mergedRanges.get(mergedRanges.size() - 1).getEndsAt(), current.getEndsAt()));
-            } else {
-                mergedRanges.add(current);
-            }
-        }
+        return null; // Return null if the range is completely outside the limits
     }
 }
 
