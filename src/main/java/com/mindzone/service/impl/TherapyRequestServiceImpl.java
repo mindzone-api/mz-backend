@@ -138,8 +138,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
             }
 
             // Updates professional availability based on the current therapy in analysis
-            List<WeekDaySchedule> updatedAvailability = removeFrom(professional.getProfessionalInfo().getAvailability(), therapy.getSchedule());
-            professional.getProfessionalInfo().setAvailability(updatedAvailability);
+            removeFrom(professional.getProfessionalInfo().getAvailability(), therapy.getSchedule());
             userService.save(professional);
 
             // update and save

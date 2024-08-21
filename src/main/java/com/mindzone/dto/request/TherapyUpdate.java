@@ -18,6 +18,5 @@ public class TherapyUpdate {
     private TherapyModality therapyModality;
     private PaymentMethod paymentMethod;
     private HealthPlan healthPlan;
-    private List<WeekDaySchedule> schedule;
     private String url;
 }

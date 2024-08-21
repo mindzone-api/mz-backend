@@ -1,6 +1,8 @@
 package com.mindzone.controller;
 
 import com.mindzone.dto.request.MzPageRequest;
+import com.mindzone.dto.request.TherapyScheduleUpdate;
+import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.dto.response.listed.ListedSession;
 import com.mindzone.model.user.User;
 import com.mindzone.service.interfaces.SessionService;
@@ -12,16 +14,17 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 
 import static com.mindzone.constants.Constants.V1;
+import static com.mindzone.enums.Role.PROFESSIONAL;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(V1 + "/sessions")
+@RequestMapping(V1 + "/sessions/{therapyId}")
 public class SessionController {
 
     private UserService userService;
     private SessionService sessionService;
 
-    @GetMapping("/{therapyId}")
+    @GetMapping
     public ResponseEntity<Page<ListedSession>> getAll(
             JwtAuthenticationToken token,
             @PathVariable String therapyId,
@@ -29,6 +32,16 @@ public class SessionController {
             ) {
         User user = userService.validateUser(token);
         return ResponseEntity.ok(sessionService.getAll(user, therapyId, mzPageRequest));
+    }
+
+    @PutMapping
+    public ResponseEntity<TherapyResponse> updateSchedule(
+            JwtAuthenticationToken token,
+            @PathVariable String therapyId,
+            @RequestBody TherapyScheduleUpdate update
+            ) {
+        User professional = userService.validateUser(token, PROFESSIONAL);
+        return ResponseEntity.ok(sessionService.updateSchedule(professional, therapyId, update));
     }
 
 }

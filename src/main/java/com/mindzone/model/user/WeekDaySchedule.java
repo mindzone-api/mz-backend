@@ -1,5 +1,6 @@
 package com.mindzone.model.user;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class WeekDaySchedule {
     private DayOfWeek day;
     private List<TimeRange> daySchedule;
