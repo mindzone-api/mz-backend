@@ -85,7 +85,6 @@ public class UserServiceImpl implements UserService {
             user.getProfessionalInfo().setAvailability(getAgendaCopy(user.getProfessionalInfo().getAgenda()));
         }
 
-        // TODO stripe integration
         save(user);
         return m.map(user, UserResponse.class);
     }

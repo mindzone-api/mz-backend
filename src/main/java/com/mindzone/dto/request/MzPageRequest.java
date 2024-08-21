@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class MzPageRequest {
-    private int page;
-    private int size;
+    private Integer page;
+    private Integer size;
 }

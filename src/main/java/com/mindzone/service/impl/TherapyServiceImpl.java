@@ -4,12 +4,12 @@ import com.mindzone.dto.request.TherapyUpdate;
 import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.dto.response.listed.ListedTherapy;
 import com.mindzone.exception.ApiRequestException;
-import com.mindzone.model.therapy.Session;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import com.mindzone.model.user.WeekDaySchedule;
 import com.mindzone.repository.TherapyRepository;
 import com.mindzone.service.interfaces.MailService;
+import com.mindzone.service.interfaces.SessionService;
 import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
@@ -23,7 +23,6 @@ import static com.mindzone.enums.Role.PATIENT;
 import static com.mindzone.enums.Role.PROFESSIONAL;
 import static com.mindzone.enums.TherapyStatus.APPROVED;
 import static com.mindzone.exception.ExceptionMessages.*;
-import static com.mindzone.util.DateUtil.MILLIS_IN_A_DAY;
 import static com.mindzone.util.WeekDayScheduleUtil.*;
 
 @Service
@@ -89,8 +88,8 @@ public class TherapyServiceImpl implements TherapyService {
     public List<ListedTherapy> getAll(User user) {
         return (
                 user.getRole() == PATIENT ?
-                        m.mapToList(therapyRepository.findAllByPatientId(user.getId()), ListedTherapy.class) :
-                        m.mapToList(therapyRepository.findAllByProfessionalId(user.getId()), ListedTherapy.class)
+                        m.listMap(therapyRepository.findAllByPatientId(user.getId()), ListedTherapy.class) :
+                        m.listMap(therapyRepository.findAllByProfessionalId(user.getId()), ListedTherapy.class)
         );
     }
 
@@ -99,6 +98,7 @@ public class TherapyServiceImpl implements TherapyService {
         Therapy therapy = getById(id);
         canManage(professional, therapy);
         if (!therapyUpdate.getSchedule().equals(therapy.getSchedule())) {
+            // FIXME update sessions occurrences before changing schedule
             professional.getProfessionalInfo().setAvailability(
                     updateProfessionalSchedule(
                             professional,
