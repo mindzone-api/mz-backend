@@ -67,4 +67,16 @@ public class MailsBody {
                         "to see more details about it."
         );
     }
+
+    public static MailDTO sessionsScheduleUpdateMail(
+            String patientMail,
+            String professionalName
+    ) {
+        return new MailDTO(
+                patientMail,
+                professionalName + " has updated your therapy schedule",
+                professionalName + " has updated informations about your therapy schedule, go to " + MINDZONE_HOMEPAGE +
+                        "to see more details about it."
+        );
+    }
 }

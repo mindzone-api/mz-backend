@@ -9,6 +9,7 @@ import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.ProfessionalInfo;
 import com.mindzone.model.user.User;
 import com.mindzone.model.user.WeekDaySchedule;
+import com.mindzone.repository.SessionRepository;
 import com.mindzone.repository.TherapyRepository;
 import com.mindzone.service.interfaces.MailService;
 import com.mindzone.service.interfaces.TherapyRequestService;
@@ -32,6 +33,7 @@ import static com.mindzone.util.WeekDayScheduleUtil.*;
 public class TherapyRequestServiceImpl implements TherapyRequestService {
 
     private TherapyRepository therapyRepository;
+    private SessionRepository sessionRepository;
     private TherapyService t;
     private UserService userService;
     private MailService mailService;
@@ -136,8 +138,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
             }
 
             // Updates professional availability based on the current therapy in analysis
-            List<WeekDaySchedule> updatedAvailability = removeFrom(professional.getProfessionalInfo().getAvailability(), therapy.getSchedule());
-            professional.getProfessionalInfo().setAvailability(updatedAvailability);
+            removeFrom(professional.getProfessionalInfo().getAvailability(), therapy.getSchedule());
             userService.save(professional);
 
             // update and save
@@ -145,8 +146,13 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
             therapy.setSince(new Date());
             therapy.setUrl(analysis.getApprovalSessionsUrl());
             therapy.setActive(true);
-            therapy.setNextSession(new Session(getNextOccurrence(therapy.getSchedule(), new Date())));
-            therapy.setSessions(new ArrayList<>());
+
+            Session session = Session.builder()
+                    .therapyId(id)
+                    .date(getNextOccurrence(therapy.getSchedule(), new Date()))
+                    .build();
+            sessionRepository.save(session);
+            therapy.setNextSessionId(session.getId());
             t.save(therapy);
 
             // notify patient about professional final analysis

@@ -18,7 +18,13 @@ public class ExceptionMessages {
     public static final String THERAPY_NOT_FOUND = "THERAPY_NOT_FOUND";
     public static final String THERAPY_IS_NOT_EDITABLE = "THERAPY_IS_NOT_EDITABLE";
     public static final String THERAPY_IS_NOT_APPROVED = "THERAPY_IS_NOT_APPROVED";
+    public static  final String THERAPY_IS_NOT_ACTIVE = "THERAPY_IS_NOT_ACTIVE";
     public static final String UPDATE_NEEDS_24_HOURS_DIFFERENCE = "UPDATE_NEEDS_24_HOURS_DIFFERENCE";
+
+    // --------------- SESSIONS --------------- \\
+
+    public static final String SESSION_NOT_FOUND = "SESSION_NOT_FOUND";
+    public static final String INVALID_NEXT_SESSION_DATE = "INVALID_NEXT_SESSION_DATE";
 
 
 

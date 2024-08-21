@@ -36,7 +36,7 @@ public class ProfessionalSearchRepositoryImpl  implements ProfessionalSearchRepo
 
         // run query
         List<User> users = mongoTemplate.find(query, User.class);
-        List<ListedProfessional> responseList = m.mapToList(users, ListedProfessional.class);
+        List<ListedProfessional> responseList = m.listMap(users, ListedProfessional.class);
 
         // return results with pagination context
         return new PageImpl<>(responseList, pageable, total);

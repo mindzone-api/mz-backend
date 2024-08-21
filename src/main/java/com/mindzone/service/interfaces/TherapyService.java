@@ -17,6 +17,8 @@ public interface TherapyService {
 
     void isApproved(Therapy therapy);
 
+    void isActive(Therapy therapy);
+
     TherapyResponse get(User user, String id);
     List<ListedTherapy> getAll(User user);
     TherapyResponse update(User professional, String id, TherapyUpdate therapyUpdate);

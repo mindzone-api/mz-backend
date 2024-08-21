@@ -13,16 +13,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
+@Document(collection = "session")
 public class Session extends AbstractModel implements Serializable {
 
+    private String therapyId;
     private String ProfessionalObservations;
     private String PatientObservations;
     private Date date;
     private Double patientMood;
     private Homework currentHomeworkState;
     private List<File> attatchments;
-
-    public Session(Date date) {
-        this.date = date;
-    }
 }
