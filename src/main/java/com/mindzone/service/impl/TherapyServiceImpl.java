@@ -6,10 +6,8 @@ import com.mindzone.dto.response.listed.ListedTherapy;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
-import com.mindzone.model.user.WeekDaySchedule;
 import com.mindzone.repository.TherapyRepository;
 import com.mindzone.service.interfaces.MailService;
-import com.mindzone.service.interfaces.SessionService;
 import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
@@ -23,7 +21,6 @@ import static com.mindzone.enums.Role.PATIENT;
 import static com.mindzone.enums.Role.PROFESSIONAL;
 import static com.mindzone.enums.TherapyStatus.APPROVED;
 import static com.mindzone.exception.ExceptionMessages.*;
-import static com.mindzone.util.WeekDayScheduleUtil.*;
 
 @Service
 @AllArgsConstructor
@@ -72,8 +69,15 @@ public class TherapyServiceImpl implements TherapyService {
 
     @Override
     public void isApproved(Therapy therapy) {
-        if (!therapy.getActive()) {
+        if (therapy.getTherapyStatus() != APPROVED) {
             throw new ApiRequestException(THERAPY_IS_NOT_APPROVED);
+        }
+    }
+
+    @Override
+    public void isActive(Therapy therapy) {
+        if (!therapy.getActive()) {
+            throw new ApiRequestException(THERAPY_IS_NOT_ACTIVE);
         }
     }
 
@@ -97,16 +101,6 @@ public class TherapyServiceImpl implements TherapyService {
     public TherapyResponse update(User professional, String id, TherapyUpdate therapyUpdate) {
         Therapy therapy = getById(id);
         canManage(professional, therapy);
-        if (!therapyUpdate.getSchedule().equals(therapy.getSchedule())) {
-            // FIXME update sessions occurrences before changing schedule
-            professional.getProfessionalInfo().setAvailability(
-                    updateProfessionalSchedule(
-                            professional,
-                            therapy.getSchedule(),
-                            therapyUpdate.getSchedule()
-                    )
-            );
-        }
         m.map(therapyUpdate, therapy);
         userService.save(professional);
         save(therapy);
@@ -116,29 +110,5 @@ public class TherapyServiceImpl implements TherapyService {
                 therapyUpdateMail(userService.getById(therapy.getPatientId()).getEmail(), professional.getName())
         );
         return m.map(therapy, TherapyResponse.class);
-    }
-
-
-    // The oldSchedule will be added back and the new one will be removed from his agenda
-    private List<WeekDaySchedule> updateProfessionalSchedule(User professional, List<WeekDaySchedule> oldTherapySchedule, List<WeekDaySchedule> newTherapySchedule) {
-        List<WeekDaySchedule> agenda = professional.getProfessionalInfo().getAgenda();
-        List<WeekDaySchedule> availability = professional.getProfessionalInfo().getAvailability();
-
-        if (fitsIn(agenda, oldTherapySchedule)) {
-            mergeWith(availability, oldTherapySchedule);
-        } else if (overlaps(agenda, oldTherapySchedule)) {
-            mergeWith(availability, oldTherapySchedule, agenda);
-        }
-
-        if (fitsIn(availability, newTherapySchedule)) {
-            removeFrom(availability, newTherapySchedule);
-        } else if (fitsIn(agenda, newTherapySchedule)) {
-            // undo the old schedule removal to throw an exception
-            removeFrom(availability, oldTherapySchedule);
-            throw new ApiRequestException(THERAPY_TIME_CONFLICT);
-        } else if (overlaps(availability, newTherapySchedule)) {
-            removeFrom(availability, newTherapySchedule);
-        }
-        return availability;
     }
 }
