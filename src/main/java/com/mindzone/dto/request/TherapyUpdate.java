@@ -20,5 +20,4 @@ public class TherapyUpdate {
     private HealthPlan healthPlan;
     private List<WeekDaySchedule> schedule;
     private String url;
-    private Date nextSession;
 }

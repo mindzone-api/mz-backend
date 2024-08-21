@@ -2,6 +2,7 @@ package com.mindzone.service.impl;
 
 import com.mindzone.dto.request.MzPageRequest;
 import com.mindzone.dto.response.listed.ListedSession;
+import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.therapy.Session;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
@@ -20,6 +21,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import static com.mindzone.exception.ExceptionMessages.UPDATE_NEEDS_24_HOURS_DIFFERENCE;
+import static com.mindzone.util.DateUtil.MILLIS_IN_A_DAY;
 import static com.mindzone.util.WeekDayScheduleUtil.getNextOccurrence;
 
 @AllArgsConstructor
@@ -58,5 +61,12 @@ public class SessionServiceImpl implements SessionService {
             therapy.setNextSession(new Session(nextSessionDate));
         }
         therapyService.save(therapy);
+    }
+
+    private void validateNextSession(Date nextSession) {
+        long differenceInMillis = Math.abs(nextSession.getTime() - new Date().getTime());
+        if (differenceInMillis >= MILLIS_IN_A_DAY) {
+            throw new ApiRequestException(UPDATE_NEEDS_24_HOURS_DIFFERENCE);
+        }
     }
 }

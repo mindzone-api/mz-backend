@@ -107,9 +107,6 @@ public class TherapyServiceImpl implements TherapyService {
                     )
             );
         }
-        if (!therapy.getNextSession().getDate().equals(therapyUpdate.getNextSession())) {
-            validateNextSession(therapyUpdate.getNextSession());
-        }
         m.map(therapyUpdate, therapy);
         userService.save(professional);
         save(therapy);
@@ -119,13 +116,6 @@ public class TherapyServiceImpl implements TherapyService {
                 therapyUpdateMail(userService.getById(therapy.getPatientId()).getEmail(), professional.getName())
         );
         return m.map(therapy, TherapyResponse.class);
-    }
-
-    private void validateNextSession(Date nextSession) {
-        long differenceInMillis = Math.abs(nextSession.getTime() - new Date().getTime());
-        if (differenceInMillis >= MILLIS_IN_A_DAY) {
-            throw new ApiRequestException(UPDATE_NEEDS_24_HOURS_DIFFERENCE);
-        }
     }
 
 
