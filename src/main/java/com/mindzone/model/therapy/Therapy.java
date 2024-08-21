@@ -33,6 +33,6 @@ public class Therapy extends AbstractModel implements Serializable {
     private PaymentMethod paymentMethod;
     private HealthPlan healthPlan;
     private List<WeekDaySchedule> schedule;
-    private Date nextSession;
-    private List<Session> completedSessions;
+    private Session nextSession;
+    private List<Session> sessions;
 }
