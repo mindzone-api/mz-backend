@@ -4,6 +4,7 @@ import com.mindzone.dto.request.SearchFilter;
 import com.mindzone.dto.request.UserRequest;
 import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.dto.response.UserResponse;
+import com.mindzone.enums.Profession;
 import com.mindzone.enums.Role;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.therapy.Therapy;
@@ -36,11 +37,7 @@ public class UserServiceImpl implements UserService {
     private UltimateModelMapper m;
 
     public void save(User model) {
-        Date now = new Date();
-        if (model.getCreatedAt() == null) {
-            model.setCreatedAt(now);
-        }
-        model.setUpdatedAt(now);
+        model.updateDates();
         userRepository.save(model);
     }
 
@@ -66,9 +63,19 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ApiRequestException(OAUTH_USER_NOT_FOUND));
     }
 
+    @Override
     public User validate(JwtAuthenticationToken token, Role role) {
         User user = validate(token);
         if (user.getRole() != role) {
+            throw new ApiRequestException(USER_UNAUTHORIZED);
+        }
+        return user;
+    }
+
+    @Override
+    public User validate(JwtAuthenticationToken token, Profession profession) {
+        User user = validate(token, PROFESSIONAL);
+        if (user.getProfessionalInfo().getProfession() != profession) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
         return user;

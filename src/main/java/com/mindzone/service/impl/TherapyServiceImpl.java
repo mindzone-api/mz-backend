@@ -33,11 +33,7 @@ public class TherapyServiceImpl implements TherapyService {
 
     @Override
     public void save(Therapy model) {
-        Date now = new Date();
-        if (model.getCreatedAt() == null) {
-            model.setCreatedAt(now);
-        }
-        model.setUpdatedAt(now);
+        model.updateDates();
         therapyRepository.save(model);
     }
 

@@ -4,6 +4,7 @@ import com.mindzone.dto.request.SearchFilter;
 import com.mindzone.dto.request.UserRequest;
 import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.dto.response.UserResponse;
+import com.mindzone.enums.Profession;
 import com.mindzone.enums.Role;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
@@ -17,6 +18,9 @@ public interface UserService {
     
     User validate(JwtAuthenticationToken token);
     User validate(JwtAuthenticationToken token, Role role);
+
+    User validate(JwtAuthenticationToken token, Profession profession);
+
     UserResponse signUp(JwtAuthenticationToken token, UserRequest userRequest);
     UserResponse get(String id);
 
