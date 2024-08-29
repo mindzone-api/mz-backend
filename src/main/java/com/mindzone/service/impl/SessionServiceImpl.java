@@ -6,14 +6,11 @@ import com.mindzone.dto.response.ProfessionalSessionResponse;
 import com.mindzone.dto.response.SessionResponse;
 import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.dto.response.listed.ListedSession;
-import com.mindzone.enums.FileType;
 import com.mindzone.exception.ApiRequestException;
-import com.mindzone.model.therapy.File;
 import com.mindzone.model.therapy.Session;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import com.mindzone.model.user.WeekDaySchedule;
-import com.mindzone.repository.FileRepository;
 import com.mindzone.repository.SessionRepository;
 import com.mindzone.service.interfaces.*;
 import com.mindzone.util.UltimateModelMapper;
@@ -48,12 +45,10 @@ public class SessionServiceImpl implements SessionService {
         return sessionRepository.findById(id)
                 .orElseThrow(() -> new ApiRequestException(SESSION_NOT_FOUND));
     }
-    private void save(Session model) {
-        Date now = new Date();
-        if (model.getCreatedAt() == null) {
-            model.setCreatedAt(now);
-        }
-        model.setUpdatedAt(now);
+
+    @Override
+    public void save(Session model) {
+        model.updateDates();
         sessionRepository.save(model);
     }
 

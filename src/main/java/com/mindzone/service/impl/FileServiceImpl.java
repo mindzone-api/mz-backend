@@ -1,7 +1,7 @@
 package com.mindzone.service.impl;
 
 import com.mindzone.enums.FileType;
-import com.mindzone.model.therapy.File;
+import com.mindzone.model.therapy.SessionFile;
 import com.mindzone.repository.FileRepository;
 import com.mindzone.service.interfaces.FileService;
 import com.mindzone.util.UltimateModelMapper;
@@ -19,41 +19,37 @@ public class FileServiceImpl implements FileService {
     private UltimateModelMapper m;
 
     @Override
-    public void save(File model) {
-        Date now = new Date();
-        if (model.getCreatedAt() == null) {
-            model.setCreatedAt(now);
-        }
-        model.setUpdatedAt(now);
+    public void save(SessionFile model) {
+        model.updateDates();
         fileRepository.save(model);
     }
 
     @Override
-    public List<File> updateSessionFiles(String sessionId, List<File> newFiles, FileType fileType) {
-        List<File> files = fileRepository.findAllBySessionIdAndFileType(sessionId, fileType);
+    public List<SessionFile> updateSessionFiles(String sessionId, List<SessionFile> newSessionFiles, FileType fileType) {
+        List<SessionFile> sessionFiles = fileRepository.findAllBySessionIdAndFileType(sessionId, fileType);
 
         // Deleting all files ocurrences that are not on the updated list
-        fileRepository.deleteAll(files.stream().filter(
-                file -> !newFiles.contains(file)
+        fileRepository.deleteAll(sessionFiles.stream().filter(
+                file -> !newSessionFiles.contains(file)
         ).toList());
 
-        for (File file : newFiles) {
-            if (files.contains(file)) { // comparing using only the id
-                File fileOnList = files.get(files.indexOf(file)); // It is possible to retrieve the file because of its id
-                m.map(file, fileOnList);
-                file = fileOnList;
+        for (SessionFile sessionFile : newSessionFiles) {
+            if (sessionFiles.contains(sessionFile)) { // comparing using only the id
+                SessionFile sessionFileOnList = sessionFiles.get(sessionFiles.indexOf(sessionFile)); // It is possible to retrieve the file because of its id
+                m.map(sessionFile, sessionFileOnList);
+                sessionFile = sessionFileOnList;
             } else {
-                file.setSessionId(sessionId);
-                file.setFileType(fileType);
-                files.add(file);
+                sessionFile.setSessionId(sessionId);
+                sessionFile.setFileType(fileType);
+                sessionFiles.add(sessionFile);
             }
-            save(file);
+            save(sessionFile);
         }
-        return files;
+        return sessionFiles;
     }
 
     @Override
-    public List<File> getBySessionIdAndFileType(String sessionId, FileType fileType) {
+    public List<SessionFile> getBySessionIdAndFileType(String sessionId, FileType fileType) {
         return fileRepository.findAllBySessionIdAndFileType(sessionId, fileType);
     }
 }
