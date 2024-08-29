@@ -26,7 +26,7 @@ public class PrescriptionController {
 
     @PostMapping
     public ResponseEntity<PrescriptionResponse> create(JwtAuthenticationToken token, @RequestBody PrescritionRequest request) {
-        User psychiatrist = userService.validade(token, PSYCHIATRIST);
+        User psychiatrist = userService.validate(token, PSYCHIATRIST);
         return ResponseEntity.ok(prescriptionService.create(psychiatrist, request));
     }
 

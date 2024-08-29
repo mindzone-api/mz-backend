@@ -79,4 +79,16 @@ public class MailsBody {
                         "to see more details about it."
         );
     }
+
+    public static MailDTO prescriptionCreationMail(
+            String patientMail,
+            String professionalName
+    ) {
+        return new MailDTO(
+                patientMail,
+                professionalName + " has prescripted medications for you",
+                professionalName + " has just prescripted medications for you, go to " + MINDZONE_HOMEPAGE +
+                        "to see more details about it."
+        );
+    }
 }
