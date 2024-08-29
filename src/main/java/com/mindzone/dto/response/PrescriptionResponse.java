@@ -11,6 +11,7 @@ import java.util.Date;
 @Data
 public class PrescriptionResponse {
 
+    private String therapyId;
     private String file;
     private String medicationName;
     private String quantity;
