@@ -2,6 +2,7 @@ package com.mindzone.service.impl;
 
 import com.mindzone.dto.request.PrescritionRequest;
 import com.mindzone.dto.response.PrescriptionResponse;
+import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.therapy.Prescription;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
@@ -15,6 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import static com.mindzone.constants.MailsBody.prescriptionCreationMail;
+import static com.mindzone.exception.ExceptionMessages.PRESCRIPTION_NOT_FOUND;
 
 @Service
 @AllArgsConstructor
@@ -49,5 +51,19 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         );
 
         return m.map(prescription, PrescriptionResponse.class);
+    }
+
+    @Override
+    public PrescriptionResponse get(User user, String prescriptionId) {
+        Prescription prescription = getById(prescriptionId);
+        Therapy therapy = therapyService.getById(prescription.getTherapyId());
+        therapyService.canAccess(user, therapy);
+        therapyService.isApproved(therapy);
+        return m.map(prescription, PrescriptionResponse.class);
+    }
+    
+    private Prescription getById(String prescriptionId) {
+        return prescriptionRepository.findById(prescriptionId)
+                .orElseThrow(() -> new ApiRequestException(PRESCRIPTION_NOT_FOUND));
     }
 }

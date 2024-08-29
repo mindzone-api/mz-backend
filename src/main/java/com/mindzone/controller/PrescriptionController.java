@@ -8,10 +8,7 @@ import com.mindzone.service.interfaces.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.mindzone.constants.Constants.V1;
 import static com.mindzone.enums.Profession.PSYCHIATRIST;
@@ -28,6 +25,12 @@ public class PrescriptionController {
     public ResponseEntity<PrescriptionResponse> create(JwtAuthenticationToken token, @RequestBody PrescritionRequest request) {
         User psychiatrist = userService.validate(token, PSYCHIATRIST);
         return ResponseEntity.ok(prescriptionService.create(psychiatrist, request));
+    }
+
+    @GetMapping("/{prescriptionId}")
+    public ResponseEntity<PrescriptionResponse> get(JwtAuthenticationToken token, @PathVariable String prescriptionId) {
+        User user = userService.validate(token);
+        return ResponseEntity.ok(prescriptionService.get(user, prescriptionId));
     }
 
 }

@@ -9,4 +9,6 @@ public interface PrescriptionService {
     void save(Prescription model);
 
     PrescriptionResponse create(User psychiatrist, PrescritionRequest request);
+
+    PrescriptionResponse get(User user, String prescriptionId);
 }
