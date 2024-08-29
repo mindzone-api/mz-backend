@@ -23,8 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-import static com.mindzone.constants.MailsBody.prescriptionCreationMail;
-import static com.mindzone.constants.MailsBody.prescriptionUpdateMail;
+import static com.mindzone.constants.MailsBody.*;
 import static com.mindzone.exception.ExceptionMessages.PRESCRIPTION_NOT_EDITABLE;
 import static com.mindzone.exception.ExceptionMessages.PRESCRIPTION_NOT_FOUND;
 
@@ -122,6 +121,13 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         }
 
         prescriptionRepository.delete(prescription);
+
+        mailService.sendMail(
+                prescriptionDeleteMail(
+                        userService.getById(therapy.getPatientId()).getEmail(),
+                        psychiatrist.getName()
+                )
+        );
         return m.map(prescription, PrescriptionResponse.class);
     }
 
