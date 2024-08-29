@@ -109,6 +109,22 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         return m.pageMap(prescriptions, ListedPrescription.class);
     }
 
+    @Override
+    public PrescriptionResponse delete(User psychiatrist, String prescriptionId) {
+        Prescription prescription = getById(prescriptionId);
+        Therapy therapy = therapyService.getById(prescription.getTherapyId());
+        therapyService.canManage(psychiatrist, therapy);
+        therapyService.isActive(therapy);
+
+
+        if (prescription.getUntil() != null && prescription.getUntil().before(new Date())) {
+            throw new ApiRequestException(PRESCRIPTION_NOT_EDITABLE);
+        }
+
+        prescriptionRepository.delete(prescription);
+        return m.map(prescription, PrescriptionResponse.class);
+    }
+
     private Prescription getById(String prescriptionId) {
         return prescriptionRepository.findById(prescriptionId)
                 .orElseThrow(() -> new ApiRequestException(PRESCRIPTION_NOT_FOUND));

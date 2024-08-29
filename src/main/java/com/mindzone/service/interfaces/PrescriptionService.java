@@ -18,4 +18,6 @@ public interface PrescriptionService {
     PrescriptionResponse update(User psychiatrist, PrescritionRequest request, String prescriptionId);
 
     Page<ListedPrescription> getAll(User user, String therapyId, MzPageRequest pageRequest);
+
+    PrescriptionResponse delete(User psychiatrist, String prescriptionId);
 }
