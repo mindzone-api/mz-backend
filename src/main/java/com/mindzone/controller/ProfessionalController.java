@@ -7,7 +7,6 @@ import com.mindzone.dto.response.listed.ListedPatient;
 import com.mindzone.dto.response.listed.ListedAlly;
 import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.model.user.User;
-import com.mindzone.model.user.WeekDaySchedule;
 import com.mindzone.service.interfaces.ProfessionalService;
 import com.mindzone.service.interfaces.UserService;
 import lombok.AllArgsConstructor;
@@ -31,25 +30,25 @@ public class ProfessionalController {
 
     @GetMapping("/my-patients")
     public ResponseEntity<List<ListedPatient>> getMyPatients(JwtAuthenticationToken token) {
-        User user = userService.validateUser(token, PROFESSIONAL);
+        User user = userService.validate(token, PROFESSIONAL);
         return ResponseEntity.ok(professionalService.getMyPatients(user));
     }
 
     @GetMapping("/my-allies")
     public ResponseEntity<List<ListedAlly>> getMyAllies(JwtAuthenticationToken token) {
-        User user = userService.validateUser(token, PROFESSIONAL);
+        User user = userService.validate(token, PROFESSIONAL);
         return ResponseEntity.ok(professionalService.getMyAllies(user));
     }
 
     @GetMapping("/search")
     public ResponseEntity<Page<ListedProfessional>> search(JwtAuthenticationToken token, @RequestBody SearchFilter filter) {
-        userService.validateUser(token);
+        userService.validate(token);
         return ResponseEntity.ok(userService.search(filter));
     }
 
     @PutMapping
     public ResponseEntity<UserResponse> update(JwtAuthenticationToken token, @RequestBody UserRequest request) {
-        User professional = userService.validateUser(token, PROFESSIONAL);
+        User professional = userService.validate(token, PROFESSIONAL);
         return ResponseEntity.ok(professionalService.update(professional, request));
     }
 

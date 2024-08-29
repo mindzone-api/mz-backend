@@ -151,6 +151,9 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
                     .therapyId(id)
                     .date(getNextOccurrence(therapy.getSchedule(), new Date()))
                     .build();
+            Date now = new Date();
+            session.setCreatedAt(now);
+            session.setUpdatedAt(now);
             sessionRepository.save(session);
             therapy.setNextSessionId(session.getId());
             t.save(therapy);

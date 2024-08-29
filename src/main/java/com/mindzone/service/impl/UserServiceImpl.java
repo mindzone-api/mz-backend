@@ -6,8 +6,10 @@ import com.mindzone.dto.response.listed.ListedProfessional;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.enums.Role;
 import com.mindzone.exception.ApiRequestException;
+import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import com.mindzone.model.user.WeekDaySchedule;
+import com.mindzone.repository.TherapyRepository;
 import com.mindzone.repository.professionalSearch.ProfessionalSearchRepository;
 import com.mindzone.repository.UserRepository;
 import com.mindzone.service.interfaces.UserService;
@@ -30,11 +32,16 @@ public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
     private ProfessionalSearchRepository search;
+    private TherapyRepository therapyRepository;
     private UltimateModelMapper m;
 
-    public void save(User user) {
-        user.setUpdatedAt(new Date());
-        this.userRepository.save(user);
+    public void save(User model) {
+        Date now = new Date();
+        if (model.getCreatedAt() == null) {
+            model.setCreatedAt(now);
+        }
+        model.setUpdatedAt(now);
+        userRepository.save(model);
     }
 
     public User getById(String id) {
@@ -54,13 +61,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User validateUser(JwtAuthenticationToken token) {
+    public User validate(JwtAuthenticationToken token) {
         return userRepository.findByEmail((String) token.getTokenAttributes().get("email"))
                 .orElseThrow(() -> new ApiRequestException(OAUTH_USER_NOT_FOUND));
     }
 
-    public User validateUser(JwtAuthenticationToken token, Role role) {
-        User user = validateUser(token);
+    public User validate(JwtAuthenticationToken token, Role role) {
+        User user = validate(token);
         if (user.getRole() != role) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
@@ -79,7 +86,6 @@ public class UserServiceImpl implements UserService {
         user.setProfilePictureURL((String) token.getTokenAttributes().get("picture"));
         user.setEmail((String) token.getTokenAttributes().get("email"));
         user.setRole(user.getProfessionalInfo() == EMPTY ? PATIENT : PROFESSIONAL);
-        user.setCreatedAt(new Date());
 
         if (user.getRole() == PROFESSIONAL) {
             user.getProfessionalInfo().setAvailability(getAgendaCopy(user.getProfessionalInfo().getAgenda()));
@@ -104,6 +110,19 @@ public class UserServiceImpl implements UserService {
         ) {
             throw new ApiRequestException(PROFESSIONAL_CODE_ALREADY_EXISTS);
         }
+    }
+
+    @Override
+    public boolean isAlly(User professional, Therapy therapy) {
+        boolean isAlly = false;
+        List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndActiveIsTrue(therapy.getPatientId());
+        for (Therapy patientTherapy : patientTherapies) {
+            if (professional.getId().equals(patientTherapy.getProfessionalId()) && !therapy.equals(patientTherapy)) {
+                isAlly = true;
+                break;
+            }
+        }
+        return isAlly;
     }
 
     @Override

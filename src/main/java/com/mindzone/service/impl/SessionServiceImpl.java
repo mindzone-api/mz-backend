@@ -1,19 +1,21 @@
 package com.mindzone.service.impl;
 
-import com.mindzone.dto.request.MzPageRequest;
-import com.mindzone.dto.request.TherapyScheduleUpdate;
+import com.mindzone.dto.request.*;
+import com.mindzone.dto.response.PatientSessionResponse;
+import com.mindzone.dto.response.ProfessionalSessionResponse;
+import com.mindzone.dto.response.SessionResponse;
 import com.mindzone.dto.response.TherapyResponse;
 import com.mindzone.dto.response.listed.ListedSession;
+import com.mindzone.enums.FileType;
 import com.mindzone.exception.ApiRequestException;
+import com.mindzone.model.therapy.File;
 import com.mindzone.model.therapy.Session;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import com.mindzone.model.user.WeekDaySchedule;
+import com.mindzone.repository.FileRepository;
 import com.mindzone.repository.SessionRepository;
-import com.mindzone.service.interfaces.MailService;
-import com.mindzone.service.interfaces.SessionService;
-import com.mindzone.service.interfaces.TherapyService;
-import com.mindzone.service.interfaces.UserService;
+import com.mindzone.service.interfaces.*;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,8 @@ import java.util.Date;
 import java.util.List;
 
 import static com.mindzone.constants.MailsBody.sessionsScheduleUpdateMail;
-import static com.mindzone.constants.MailsBody.therapyUpdateMail;
+import static com.mindzone.enums.FileType.*;
+import static com.mindzone.enums.Role.PATIENT;
 import static com.mindzone.exception.ExceptionMessages.*;
 import static com.mindzone.util.DateUtil.MILLIS_IN_A_DAY;
 import static com.mindzone.util.WeekDayScheduleUtil.*;
@@ -38,15 +41,20 @@ public class SessionServiceImpl implements SessionService {
     private SessionRepository sessionRepository;
     private UserService userService;
     private MailService mailService;
+    private FileService fileService;
     private UltimateModelMapper m;
 
     private Session getById(String id) {
         return sessionRepository.findById(id)
                 .orElseThrow(() -> new ApiRequestException(SESSION_NOT_FOUND));
     }
-    private void save(Session session) {
-        session.setUpdatedAt(new Date());
-        sessionRepository.save(session);
+    private void save(Session model) {
+        Date now = new Date();
+        if (model.getCreatedAt() == null) {
+            model.setCreatedAt(now);
+        }
+        model.setUpdatedAt(now);
+        sessionRepository.save(model);
     }
 
     @Override
@@ -97,6 +105,76 @@ public class SessionServiceImpl implements SessionService {
         therapyService.save(therapy);
         userService.save(professional);
         return m.map(therapy, TherapyResponse.class);
+    }
+
+    @Override
+    public SessionResponse get(User user, String sessionId) {
+        Session session = getById(sessionId);
+        SessionResponse response;
+        Therapy therapy = therapyService.getById(session.getTherapyId());
+        therapyService.canAccess(user, therapy);
+        therapyService.isApproved(therapy);
+
+
+        if (user.getRole() == PATIENT) {
+            PatientSessionResponse patientResponse = new PatientSessionResponse();
+            patientResponse.setPatientAttatchments(fileService.getBySessionIdAndFileType(sessionId, FOR_PATIENT));
+            response = patientResponse;
+        } else {
+            ProfessionalSessionResponse professionalResponse = new ProfessionalSessionResponse();
+            professionalResponse.setProfessionalAttatchments(fileService.getBySessionIdAndFileType(sessionId, FOR_PROFESSIONAL));
+            if (userService.isAlly(user, therapy)) {
+                professionalResponse.setProfessionalAttatchments(
+                    professionalResponse.getProfessionalAttatchments().stream().filter(
+                            attachment -> !attachment.getIsMedicalRecord()
+                    ).toList()
+                );
+            }
+            response = professionalResponse;
+        }
+        response.setSharedAttatchments(fileService.getBySessionIdAndFileType(sessionId, SHARED));
+        m.map(session, response);
+        /*
+            TODO
+           1- questionnaires statistics -> An endpoint will be built to calculate statistics based on requested and sessions date
+           2- homework state -> get it from the creation date
+           3- medicines -> get it from the creation date
+        */
+        return response;
+    }
+
+    @Override
+    public SessionResponse update(User user, String sessionId, SessionRequest request) {
+        Session session = getById(sessionId);
+        SessionResponse response = null;
+        Therapy therapy = therapyService.getById(session.getTherapyId());
+        therapyService.canManage(user, therapy);
+        therapyService.isActive(therapy);
+        m.map(request, session);
+
+
+        if (request instanceof PatientSessionRequest patientRequest) {
+            PatientSessionResponse patientResponse = new PatientSessionResponse();
+            patientResponse.setPatientAttatchments(
+                fileService.updateSessionFiles(sessionId, patientRequest.getPatientAttatchments(), FOR_PATIENT)
+            );
+            response = patientResponse;
+
+        } else if (request instanceof ProfessionalSessionRequest professionalRequest) {
+            ProfessionalSessionResponse professionalResponse = new ProfessionalSessionResponse();
+            professionalResponse.setProfessionalAttatchments(
+                fileService.updateSessionFiles(sessionId, professionalRequest.getProfessionalAttatchments(), FOR_PROFESSIONAL)
+            );
+            response = professionalResponse;
+        }
+        if (response != null) {
+            response.setSharedAttatchments(
+                    fileService.updateSessionFiles(sessionId, request.getSharedAttatchments(), SHARED)
+            );
+        }
+        save(session);
+        m.map(session, response);
+        return response;
     }
 
     private void insertCompletedSessions(Therapy therapy) {

@@ -32,9 +32,13 @@ public class TherapyServiceImpl implements TherapyService {
     private MailService mailService;
 
     @Override
-    public void save(Therapy therapy) {
-        therapy.setUpdatedAt(new Date());
-        therapyRepository.save(therapy);
+    public void save(Therapy model) {
+        Date now = new Date();
+        if (model.getCreatedAt() == null) {
+            model.setCreatedAt(now);
+        }
+        model.setUpdatedAt(now);
+        therapyRepository.save(model);
     }
 
     @Override
