@@ -15,7 +15,11 @@ import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 import static com.mindzone.constants.MailsBody.prescriptionCreationMail;
+import static com.mindzone.constants.MailsBody.prescriptionUpdateMail;
+import static com.mindzone.exception.ExceptionMessages.PRESCRIPTION_NOT_EDITABLE;
 import static com.mindzone.exception.ExceptionMessages.PRESCRIPTION_NOT_FOUND;
 
 @Service
@@ -61,7 +65,31 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         therapyService.isApproved(therapy);
         return m.map(prescription, PrescriptionResponse.class);
     }
-    
+
+    @Override
+    public PrescriptionResponse update(User psychiatrist, PrescritionRequest request, String prescriptionId) {
+        Therapy therapy = therapyService.getById(request.getTherapyId());
+        therapyService.canManage(psychiatrist, therapy);
+        therapyService.isActive(therapy);
+
+        Prescription prescription = getById(prescriptionId);
+        if (prescription.getUntil() != null && prescription.getUntil().before(new Date())) {
+            throw new ApiRequestException(PRESCRIPTION_NOT_EDITABLE);
+        }
+
+        m.map(request, prescription);
+        save(prescription);
+
+        mailService.sendMail(
+                prescriptionUpdateMail(
+                        userService.getById(therapy.getPatientId()).getEmail(),
+                        psychiatrist.getName()
+                )
+        );
+
+        return m.map(prescription, PrescriptionResponse.class);
+    }
+
     private Prescription getById(String prescriptionId) {
         return prescriptionRepository.findById(prescriptionId)
                 .orElseThrow(() -> new ApiRequestException(PRESCRIPTION_NOT_FOUND));

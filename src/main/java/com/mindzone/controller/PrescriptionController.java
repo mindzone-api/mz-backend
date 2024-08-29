@@ -33,4 +33,14 @@ public class PrescriptionController {
         return ResponseEntity.ok(prescriptionService.get(user, prescriptionId));
     }
 
+    @PutMapping("/{prescriptionId}")
+    public ResponseEntity<PrescriptionResponse> update(
+            JwtAuthenticationToken token,
+            @RequestBody PrescritionRequest request,
+            @PathVariable String prescriptionId
+    ) {
+        User psychiatrist = userService.validate(token, PSYCHIATRIST);
+        return ResponseEntity.ok(prescriptionService.update(psychiatrist, request, prescriptionId));
+    }
+
 }

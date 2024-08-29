@@ -11,4 +11,6 @@ public interface PrescriptionService {
     PrescriptionResponse create(User psychiatrist, PrescritionRequest request);
 
     PrescriptionResponse get(User user, String prescriptionId);
+
+    PrescriptionResponse update(User psychiatrist, PrescritionRequest request, String prescriptionId);
 }
