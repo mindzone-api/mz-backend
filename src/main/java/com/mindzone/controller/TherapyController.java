@@ -26,13 +26,13 @@ public class TherapyController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TherapyResponse> get(JwtAuthenticationToken token, @PathVariable String id) {
-        User user = userService.validateUser(token);
+        User user = userService.validate(token);
         return ResponseEntity.ok(therapyService.get(user, id));
     }
 
     @GetMapping("/get-all")
     public ResponseEntity<List<ListedTherapy>> getAll(JwtAuthenticationToken token) {
-        User user = userService.validateUser(token);
+        User user = userService.validate(token);
         return ResponseEntity.ok(therapyService.getAll(user));
     }
 
@@ -42,7 +42,7 @@ public class TherapyController {
             @PathVariable String id,
             @RequestBody TherapyUpdate therapyUpdate
     ) {
-        User professional = userService.validateUser(token, PROFESSIONAL);
+        User professional = userService.validate(token, PROFESSIONAL);
         return ResponseEntity.ok(therapyService.update(professional, id, therapyUpdate));
     }
 }

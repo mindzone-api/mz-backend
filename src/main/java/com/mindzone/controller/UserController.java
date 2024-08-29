@@ -27,13 +27,13 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> get(JwtAuthenticationToken token, @PathVariable String id) {
-        userService.validateUser(token);
+        userService.validate(token);
         return ResponseEntity.ok(userService.get(id));
     }
 
     @GetMapping
     public ResponseEntity<UserResponse> whoAmI(JwtAuthenticationToken token) {
-        User user = userService.validateUser(token);
+        User user = userService.validate(token);
         return ResponseEntity.ok(userService.whoAmI(user));
     }
 

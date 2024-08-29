@@ -26,13 +26,13 @@ public class PatientController {
 
     @GetMapping("/my-professionals")
     public ResponseEntity<List<ListedProfessional>> getMyProfessionals(JwtAuthenticationToken token) {
-        User user = userService.validateUser(token, PATIENT);
+        User user = userService.validate(token, PATIENT);
         return ResponseEntity.ok(patientService.getMyProfessionals(user));
     }
 
     @PutMapping
     public ResponseEntity<UserResponse> update(JwtAuthenticationToken token, @RequestBody UserRequest request) {
-        User patient = userService.validateUser(token, PATIENT);
+        User patient = userService.validate(token, PATIENT);
         return ResponseEntity.ok(patientService.update(patient, request));
     }
 }

@@ -18,10 +18,11 @@ import java.util.List;
 public class Session extends AbstractModel implements Serializable {
 
     private String therapyId;
-    private String ProfessionalObservations;
-    private String PatientObservations;
     private Date date;
-    private Double patientMood;
+
+    private String professionalObservations;
     private Homework currentHomeworkState;
-    private List<File> attatchments;
+    private Double patientMood;
+
+    private String PatientObservations;
 }

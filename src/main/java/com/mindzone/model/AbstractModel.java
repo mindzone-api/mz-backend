@@ -1,6 +1,8 @@
 package com.mindzone.model;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
@@ -8,6 +10,7 @@ import java.util.Date;
 
 
 @Data
+@EqualsAndHashCode(of = "id")
 public abstract class AbstractModel implements Serializable {
 
     @Id

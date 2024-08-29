@@ -28,7 +28,7 @@ public class TherapyRequestController {
             JwtAuthenticationToken token,
             @RequestBody TherapyRequest therapyRequest
     ) {
-        User patient = userService.validateUser(token, PATIENT);
+        User patient = userService.validate(token, PATIENT);
         return ResponseEntity.ok(therapyRequestService.requestTherapy(therapyRequest, patient));
     }
 
@@ -38,13 +38,13 @@ public class TherapyRequestController {
             @PathVariable String id,
             @RequestBody TherapyRequest therapyRequest
     ) {
-        User patient = userService.validateUser(token, PATIENT);
+        User patient = userService.validate(token, PATIENT);
         return ResponseEntity.ok(therapyRequestService.updateRequest(patient, id, therapyRequest));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<TherapyResponse> deleteRequest(JwtAuthenticationToken token, @PathVariable String id) {
-        User patient = userService.validateUser(token, PATIENT);
+        User patient = userService.validate(token, PATIENT);
         return ResponseEntity.ok(therapyRequestService.deleteRequest(patient, id));
     }
 
@@ -54,7 +54,7 @@ public class TherapyRequestController {
             @PathVariable String id,
             @RequestBody TherapyRequestAnalysis analysis
             ) {
-        User professional = userService.validateUser(token, PROFESSIONAL);
+        User professional = userService.validate(token, PROFESSIONAL);
         return ResponseEntity.ok(therapyRequestService.analyseRequest(professional, id, analysis));
     }
 
