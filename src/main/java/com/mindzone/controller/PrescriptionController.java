@@ -55,4 +55,10 @@ public class PrescriptionController {
         User user = userService.validate(token);
         return ResponseEntity.ok(prescriptionService.getAll(user, therapyId, pageRequest));
     }
+
+    @DeleteMapping("/{prescriptionId}")
+    public ResponseEntity<PrescriptionResponse> delete(JwtAuthenticationToken token, @PathVariable String prescriptionId) {
+        User psychiatrist = userService.validate(token, PSYCHIATRIST);
+        return ResponseEntity.ok(prescriptionService.delete(psychiatrist, prescriptionId));
+    }
 }
