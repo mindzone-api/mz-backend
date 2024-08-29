@@ -1,7 +1,9 @@
 package com.mindzone.service.impl;
 
+import com.mindzone.dto.request.MzPageRequest;
 import com.mindzone.dto.request.PrescritionRequest;
 import com.mindzone.dto.response.PrescriptionResponse;
+import com.mindzone.dto.response.listed.ListedPrescription;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.therapy.Prescription;
 import com.mindzone.model.therapy.Therapy;
@@ -13,6 +15,10 @@ import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -88,6 +94,19 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         );
 
         return m.map(prescription, PrescriptionResponse.class);
+    }
+
+    @Override
+    public Page<ListedPrescription> getAll(User user, String therapyId, MzPageRequest pageRequest) {
+        Therapy therapy = therapyService.getById(therapyId);
+        therapyService.canAccess(user, therapy);
+        therapyService.isApproved(therapy);
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(), sort);
+        Page<Prescription> prescriptions = prescriptionRepository.findByTherapyId(therapyId, pageable);
+
+        return m.pageMap(prescriptions, ListedPrescription.class);
     }
 
     private Prescription getById(String prescriptionId) {
