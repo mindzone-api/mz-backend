@@ -91,4 +91,16 @@ public class MailsBody {
                         "to see more details about it."
         );
     }
+
+    public static MailDTO prescriptionUpdateMail(
+            String patientMail,
+            String professionalName
+    ) {
+        return new MailDTO(
+                patientMail,
+                professionalName + " has updated prescripted medications for you",
+                professionalName + " has just updated prescripted medications for you, go to " + MINDZONE_HOMEPAGE +
+                        "to see more details about it."
+        );
+    }
 }
