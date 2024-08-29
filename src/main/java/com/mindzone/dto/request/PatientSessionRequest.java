@@ -1,12 +1,10 @@
 package com.mindzone.dto.request;
 
-import com.mindzone.model.therapy.File;
+import com.mindzone.model.therapy.SessionFile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor
@@ -15,5 +13,5 @@ import java.util.List;
 public class PatientSessionRequest extends SessionRequest {
 
     private String PatientObservations;
-    private List<File> patientAttatchments;
+    private List<SessionFile> patientAttatchments;
 }

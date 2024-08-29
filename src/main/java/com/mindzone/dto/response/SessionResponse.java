@@ -1,6 +1,6 @@
 package com.mindzone.dto.response;
 
-import com.mindzone.model.therapy.File;
+import com.mindzone.model.therapy.SessionFile;
 import lombok.Data;
 
 import java.util.Date;
@@ -11,6 +11,6 @@ public abstract class SessionResponse {
 
     private String therapyId;
     private Date date;
-    private List<File> sharedAttatchments;
+    private List<SessionFile> sharedAttatchments;
 
 }

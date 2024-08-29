@@ -2,7 +2,7 @@ package com.mindzone.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.mindzone.model.therapy.File;
+import com.mindzone.model.therapy.SessionFile;
 import lombok.Data;
 
 import java.util.List;
@@ -17,6 +17,6 @@ import java.util.List;
 })
 public abstract class SessionRequest {
 
-    private List<File> sharedAttatchments;
+    private List<SessionFile> sharedAttatchments;
 
 }

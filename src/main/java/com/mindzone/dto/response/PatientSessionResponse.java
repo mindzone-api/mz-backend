@@ -1,6 +1,6 @@
 package com.mindzone.dto.response;
 
-import com.mindzone.model.therapy.File;
+import com.mindzone.model.therapy.SessionFile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,5 +14,5 @@ import java.util.List;
 public class PatientSessionResponse extends SessionResponse {
 
     private String PatientObservations;
-    private List<File> patientAttatchments;
+    private List<SessionFile> patientAttatchments;
 }

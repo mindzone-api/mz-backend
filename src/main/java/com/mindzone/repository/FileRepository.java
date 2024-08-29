@@ -1,12 +1,12 @@
 package com.mindzone.repository;
 
 import com.mindzone.enums.FileType;
-import com.mindzone.model.therapy.File;
+import com.mindzone.model.therapy.SessionFile;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface FileRepository extends MongoRepository<File, String> {
+public interface FileRepository extends MongoRepository<SessionFile, String> {
 
-    List<File> findAllBySessionIdAndFileType(String sessionId, FileType fileType);
+    List<SessionFile> findAllBySessionIdAndFileType(String sessionId, FileType fileType);
 }
