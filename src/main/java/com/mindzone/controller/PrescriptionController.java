@@ -1,5 +1,6 @@
 package com.mindzone.controller;
 
+import com.mindzone.dto.request.ActivePrescriptionsRequest;
 import com.mindzone.dto.request.MzPageRequest;
 import com.mindzone.dto.request.PrescritionRequest;
 import com.mindzone.dto.response.PrescriptionResponse;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.mindzone.constants.Constants.V1;
 import static com.mindzone.enums.Profession.PSYCHIATRIST;
@@ -60,5 +63,16 @@ public class PrescriptionController {
     public ResponseEntity<PrescriptionResponse> delete(JwtAuthenticationToken token, @PathVariable String prescriptionId) {
         User psychiatrist = userService.validate(token, PSYCHIATRIST);
         return ResponseEntity.ok(prescriptionService.delete(psychiatrist, prescriptionId));
+    }
+
+    @GetMapping("/actives/{therapyId}")
+    public ResponseEntity<List<ListedPrescription>> getActivePrecriptions(
+            JwtAuthenticationToken token,
+            @PathVariable String therapyId,
+            @RequestBody ActivePrescriptionsRequest date
+
+    ) {
+        User user = userService.validate(token);
+        return ResponseEntity.ok(prescriptionService.getActivePrecriptions(user, therapyId, date));
     }
 }

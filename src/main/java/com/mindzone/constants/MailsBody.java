@@ -103,4 +103,16 @@ public class MailsBody {
                         "to see more details about it."
         );
     }
+
+    public static MailDTO prescriptionDeleteMail(
+            String patientMail,
+            String professionalName
+    ) {
+        return new MailDTO(
+                patientMail,
+                professionalName + " has deleted prescripted medications for you",
+                professionalName + " has just deleted prescripted medications for you, go to " + MINDZONE_HOMEPAGE +
+                        "to see more details about it."
+        );
+    }
 }
