@@ -6,6 +6,8 @@ import com.mindzone.service.interfaces.ReportFileService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class ReportFileServiceImpl implements ReportFileService {
@@ -15,5 +17,10 @@ public class ReportFileServiceImpl implements ReportFileService {
     public void save(ReportFile model) {
         model.updateDates();
         reportFileRepository.save(model);
+    }
+
+    @Override
+    public List<ReportFile> getAll(String reportId) {
+        return reportFileRepository.findAllByReportId(reportId);
     }
 }

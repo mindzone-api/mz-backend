@@ -45,24 +45,14 @@ public class TherapyServiceImpl implements TherapyService {
 
     @Override
     public void canAccess(User user, Therapy therapy) {
-        if (user.getRole() == PATIENT) {
-            if (!therapy.getPatientId().equals(user.getId())) {
-                throw new ApiRequestException(USER_UNAUTHORIZED);
-            }
-        } else if (user.getRole() == PROFESSIONAL) {
-            List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndTherapyStatus(therapy.getPatientId(), APPROVED);
-            List<Therapy> patientTherapiesWithLoggedProfessional = patientTherapies.stream().filter(t -> t.getProfessionalId().equals(user.getId())).toList();
-            if (patientTherapiesWithLoggedProfessional.isEmpty()) {
-                throw new ApiRequestException(USER_UNAUTHORIZED);
-            }
+        if (!therapy.getPatientId().equals(user.getId()) && !therapy.getProfessionalId().equals(user.getId())) {
+            throw new ApiRequestException(USER_UNAUTHORIZED);
         }
     }
 
     @Override
     public void canManage(User user, Therapy therapy) {
-        if (user.getRole() == PATIENT && !therapy.getPatientId().equals(user.getId())) {
-            throw new ApiRequestException(USER_UNAUTHORIZED);
-        } else if (user.getRole() == PROFESSIONAL && !therapy.getProfessionalId().equals(user.getId())) {
+        if (!therapy.getPatientId().equals(user.getId()) && !therapy.getProfessionalId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
     }

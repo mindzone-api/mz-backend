@@ -53,9 +53,23 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    public void canAccessSessions(User user, Therapy therapy) {
+        if (!therapy.getPatientId().equals(user.getId()) && !therapy.getProfessionalId().equals(user.getId())) {
+            throw new ApiRequestException(USER_UNAUTHORIZED);
+        }
+    }
+
+    @Override
+    public void canManageSessions(User user, Therapy therapy) {
+        if (!therapy.getProfessionalId().equals(user.getId())) {
+            throw new ApiRequestException(USER_UNAUTHORIZED);
+        }
+    }
+
+    @Override
     public Page<ListedSession> getAll(User user, String therapyId, MzPageRequest mzPageRequest) {
         Therapy therapy = therapyService.getById(therapyId);
-        therapyService.canAccess(user, therapy);
+        canAccessSessions(user, therapy);
         therapyService.isApproved(therapy);
         insertCompletedSessions(therapy);
 
@@ -69,7 +83,7 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public TherapyResponse updateSchedule(User professional, String therapyId, TherapyScheduleUpdate update) {
         Therapy therapy = therapyService.getById(therapyId);
-        therapyService.canManage(professional, therapy);
+        canManageSessions(professional, therapy);
         therapyService.isActive(therapy);
         insertCompletedSessions(therapy);
 
@@ -107,7 +121,7 @@ public class SessionServiceImpl implements SessionService {
         Session session = getById(sessionId);
         SessionResponse response;
         Therapy therapy = therapyService.getById(session.getTherapyId());
-        therapyService.canAccess(user, therapy);
+        canAccessSessions(user, therapy);
         therapyService.isApproved(therapy);
 
 
@@ -133,7 +147,6 @@ public class SessionServiceImpl implements SessionService {
             TODO
            1- questionnaires statistics -> An endpoint will be built to calculate statistics based on requested and sessions date
            2- homework state -> get it from the creation date
-           3- medicines -> get it from the creation date
         */
         return response;
     }
@@ -143,7 +156,7 @@ public class SessionServiceImpl implements SessionService {
         Session session = getById(sessionId);
         SessionResponse response = null;
         Therapy therapy = therapyService.getById(session.getTherapyId());
-        therapyService.canManage(user, therapy);
+        canManageSessions(user, therapy);
         therapyService.isActive(therapy);
         m.map(request, session);
 

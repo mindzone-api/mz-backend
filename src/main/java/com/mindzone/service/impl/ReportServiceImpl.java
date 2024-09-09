@@ -7,7 +7,6 @@ import com.mindzone.model.Report;
 import com.mindzone.model.ReportFile;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
-import com.mindzone.repository.ReportFileRepository;
 import com.mindzone.repository.ReportRepository;
 import com.mindzone.service.interfaces.ReportFileService;
 import com.mindzone.service.interfaces.ReportService;
@@ -39,30 +38,32 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Report getById(String id) {
-        return reportRepository.findById(id)
-                .orElseThrow(() -> new ApiRequestException(REPORT_NOT_FOUND));
-    }
-
-    private void canAccess(User professional, Therapy therapy) {
+    public void canAccessReports(User user, Therapy therapy) {
         if (
-                !professional.getId().equals(therapy.getProfessionalId()) &&
-                !userService.isAlly(professional, therapy)
+                !therapy.getProfessionalId().equals(user.getId()) &&
+                !userService.isAlly(user, therapy)
         ) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
     }
 
-    private void canManage(User professional, Therapy therapy) {
-        if (!professional.getId().equals(therapy.getProfessionalId())) {
+    @Override
+    public void canManageReports(User user, Therapy therapy) {
+        if (!therapy.getProfessionalId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
     }
 
     @Override
+    public Report getById(String id) {
+        return reportRepository.findById(id)
+                .orElseThrow(() -> new ApiRequestException(REPORT_NOT_FOUND));
+    }
+
+    @Override
     public ReportResponse create(User professional, ReportRequest request) {
         Therapy therapy = therapyService.getById(request.getTherapyId());
-        therapyService.canManage(professional, therapy);
+        canManageReports(professional, therapy);
         therapyService.isActive(therapy);
         Report report = m.map(request, Report.class);
         save(report);
@@ -73,6 +74,17 @@ public class ReportServiceImpl implements ReportService {
             fileService.save(attachment);
             response.getAttachments().add(attachment);
         }
+        return response;
+    }
+
+    @Override
+    public ReportResponse get(User professional, String reportId) {
+        Report report = getById(reportId);
+        Therapy therapy = therapyService.getById(report.getTherapyId());
+        canAccessReports(professional, therapy);
+        therapyService.isApproved(therapy);
+        ReportResponse response = m.map(report, ReportResponse.class);
+        response.setAttachments(fileService.getAll(reportId));
         return response;
     }
 }

@@ -26,8 +26,8 @@ import java.util.Date;
 import java.util.List;
 
 import static com.mindzone.constants.MailsBody.*;
-import static com.mindzone.exception.ExceptionMessages.PRESCRIPTION_NOT_EDITABLE;
-import static com.mindzone.exception.ExceptionMessages.PRESCRIPTION_NOT_FOUND;
+import static com.mindzone.exception.ExceptionMessages.*;
+import static com.mindzone.exception.ExceptionMessages.USER_UNAUTHORIZED;
 
 @Service
 @AllArgsConstructor
@@ -46,9 +46,27 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     }
 
     @Override
+    public void canAccessPrescriptions(User user, Therapy therapy) {
+        if (
+                !therapy.getPatientId().equals(user.getId()) &&
+                !therapy.getProfessionalId().equals(user.getId()) &&
+                !userService.isAlly(user, therapy)
+        ) {
+            throw new ApiRequestException(USER_UNAUTHORIZED);
+        }
+    }
+
+    @Override
+    public void canManagePrescriptions(User user, Therapy therapy) {
+        if (!therapy.getProfessionalId().equals(user.getId())) {
+            throw new ApiRequestException(USER_UNAUTHORIZED);
+        }
+    }
+
+    @Override
     public PrescriptionResponse create(User psychiatrist, PrescritionRequest request) {
         Therapy therapy = therapyService.getById(request.getTherapyId());
-        therapyService.canManage(psychiatrist, therapy);
+        canManagePrescriptions(psychiatrist, therapy);
         therapyService.isActive(therapy);
 
         Prescription prescription = m.map(request, Prescription.class);
@@ -68,7 +86,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     public PrescriptionResponse get(User user, String prescriptionId) {
         Prescription prescription = getById(prescriptionId);
         Therapy therapy = therapyService.getById(prescription.getTherapyId());
-        therapyService.canAccess(user, therapy);
+        canAccessPrescriptions(user, therapy);
         therapyService.isApproved(therapy);
         return m.map(prescription, PrescriptionResponse.class);
     }
@@ -76,7 +94,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     @Override
     public PrescriptionResponse update(User psychiatrist, PrescritionRequest request, String prescriptionId) {
         Therapy therapy = therapyService.getById(request.getTherapyId());
-        therapyService.canManage(psychiatrist, therapy);
+        canManagePrescriptions(psychiatrist, therapy);
         therapyService.isActive(therapy);
 
         Prescription prescription = getById(prescriptionId);
@@ -100,7 +118,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     @Override
     public Page<ListedPrescription> getAll(User user, String therapyId, MzPageRequest pageRequest) {
         Therapy therapy = therapyService.getById(therapyId);
-        therapyService.canAccess(user, therapy);
+        canAccessPrescriptions(user, therapy);
         therapyService.isApproved(therapy);
 
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
@@ -114,7 +132,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     public PrescriptionResponse delete(User psychiatrist, String prescriptionId) {
         Prescription prescription = getById(prescriptionId);
         Therapy therapy = therapyService.getById(prescription.getTherapyId());
-        therapyService.canManage(psychiatrist, therapy);
+        canManagePrescriptions(psychiatrist, therapy);
         therapyService.isActive(therapy);
 
 
@@ -140,7 +158,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             ActivePrescriptionsRequest date
     ) {
         Therapy therapy = therapyService.getById(therapyId);
-        therapyService.canAccess(user, therapy);
+        canAccessPrescriptions(user, therapy);
         therapyService.isActive(therapy);
 
         List<Prescription> prescriptions = prescriptionRepository.getActivePrescriptions(therapyId, date.getDate());
