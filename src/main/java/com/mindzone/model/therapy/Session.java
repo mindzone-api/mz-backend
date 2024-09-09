@@ -1,13 +1,12 @@
 package com.mindzone.model.therapy;
 
-import com.mindzone.enums.Role;
 import com.mindzone.model.AbstractModel;
+import com.mindzone.model.Homework;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor

@@ -31,4 +31,8 @@ public class ExceptionMessages {
     public static final String PRESCRIPTION_NOT_FOUND = "PRESCRIPTION_NOT_FOUND";
     public static final String PRESCRIPTION_NOT_EDITABLE = "PRESCRIPTION_NOT_EDITABLE";
 
+    // --------------- REPORT --------------- \\
+
+    public static final String REPORT_NOT_FOUND = "REPORT_NOT_FOUND";
+
 }

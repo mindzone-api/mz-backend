@@ -5,7 +5,7 @@ import com.mindzone.dto.request.MzPageRequest;
 import com.mindzone.dto.request.PrescritionRequest;
 import com.mindzone.dto.response.PrescriptionResponse;
 import com.mindzone.dto.response.listed.ListedPrescription;
-import com.mindzone.model.therapy.Prescription;
+import com.mindzone.model.Prescription;
 import com.mindzone.model.user.User;
 import org.springframework.data.domain.Page;
 

@@ -6,7 +6,7 @@ import com.mindzone.dto.request.PrescritionRequest;
 import com.mindzone.dto.response.PrescriptionResponse;
 import com.mindzone.dto.response.listed.ListedPrescription;
 import com.mindzone.exception.ApiRequestException;
-import com.mindzone.model.therapy.Prescription;
+import com.mindzone.model.Prescription;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import com.mindzone.repository.PrescriptionRepository;

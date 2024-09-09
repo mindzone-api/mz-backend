@@ -6,6 +6,7 @@ import com.mindzone.dto.response.UserResponse;
 import com.mindzone.dto.response.listed.ListedPatient;
 import com.mindzone.dto.response.listed.ListedAlly;
 import com.mindzone.dto.response.listed.ListedProfessional;
+import com.mindzone.dto.response.listed.ListedTherapy;
 import com.mindzone.model.user.User;
 import com.mindzone.service.interfaces.ProfessionalService;
 import com.mindzone.service.interfaces.UserService;
@@ -38,6 +39,12 @@ public class ProfessionalController {
     public ResponseEntity<List<ListedAlly>> getMyAllies(JwtAuthenticationToken token) {
         User user = userService.validate(token, PROFESSIONAL);
         return ResponseEntity.ok(professionalService.getMyAllies(user));
+    }
+
+    @GetMapping("/my-allies-therapies")
+    public ResponseEntity<List<ListedTherapy>> getMyAlliesTherapies(JwtAuthenticationToken token) {
+        User user = userService.validate(token, PROFESSIONAL);
+        return ResponseEntity.ok(professionalService.getMyAlliesTherapies(user));
     }
 
     @GetMapping("/search")

@@ -3,6 +3,7 @@ package com.mindzone.service.impl;
 import com.mindzone.dto.request.UserRequest;
 import com.mindzone.dto.response.UserResponse;
 import com.mindzone.dto.response.listed.ListedPatient;
+import com.mindzone.dto.response.listed.ListedTherapy;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import com.mindzone.model.user.WeekDaySchedule;
@@ -69,6 +70,18 @@ public class ProfessionalServiceImpl implements ProfessionalService {
         updateProfessionalAvailability(professional);
         userService.save(professional);
         return m.map(professional, UserResponse.class);
+    }
+
+    @Override
+    public List<ListedTherapy> getMyAlliesTherapies(User professional) {
+        List<ListedTherapy> response = new ArrayList<>();
+
+        for (Therapy therapy : therapyRepository.findAllByProfessionalIdAndActiveIsTrue(professional.getId())) {
+            List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndActiveIsTrue(therapy.getPatientId());
+            patientTherapies.removeIf(t -> t.getProfessionalId().equals(professional.getId()));
+            response.addAll(m.listMap(patientTherapies, ListedTherapy.class));
+        }
+        return response;
     }
 
     private void updateProfessionalAvailability(User professional) {

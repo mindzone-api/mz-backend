@@ -2,34 +2,32 @@ package com.mindzone.service.impl;
 
 import com.mindzone.enums.FileType;
 import com.mindzone.model.therapy.SessionFile;
-import com.mindzone.repository.FileRepository;
-import com.mindzone.service.interfaces.FileService;
+import com.mindzone.repository.SessionFileRepository;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class FileServiceImpl implements FileService {
+public class SessionFileService implements com.mindzone.service.interfaces.SessionFileService {
 
-    private FileRepository fileRepository;
+    private SessionFileRepository sessionFileRepository;
     private UltimateModelMapper m;
 
     @Override
     public void save(SessionFile model) {
         model.updateDates();
-        fileRepository.save(model);
+        sessionFileRepository.save(model);
     }
 
     @Override
     public List<SessionFile> updateSessionFiles(String sessionId, List<SessionFile> newSessionFiles, FileType fileType) {
-        List<SessionFile> sessionFiles = fileRepository.findAllBySessionIdAndFileType(sessionId, fileType);
+        List<SessionFile> sessionFiles = sessionFileRepository.findAllBySessionIdAndFileType(sessionId, fileType);
 
         // Deleting all files ocurrences that are not on the updated list
-        fileRepository.deleteAll(sessionFiles.stream().filter(
+        sessionFileRepository.deleteAll(sessionFiles.stream().filter(
                 file -> !newSessionFiles.contains(file)
         ).toList());
 
@@ -50,6 +48,6 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<SessionFile> getBySessionIdAndFileType(String sessionId, FileType fileType) {
-        return fileRepository.findAllBySessionIdAndFileType(sessionId, fileType);
+        return sessionFileRepository.findAllBySessionIdAndFileType(sessionId, fileType);
     }
 }

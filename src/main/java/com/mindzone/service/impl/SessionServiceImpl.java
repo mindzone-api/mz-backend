@@ -38,7 +38,7 @@ public class SessionServiceImpl implements SessionService {
     private SessionRepository sessionRepository;
     private UserService userService;
     private MailService mailService;
-    private FileService fileService;
+    private SessionFileService sessionFileService;
     private UltimateModelMapper m;
 
     private Session getById(String id) {
@@ -113,11 +113,11 @@ public class SessionServiceImpl implements SessionService {
 
         if (user.getRole() == PATIENT) {
             PatientSessionResponse patientResponse = new PatientSessionResponse();
-            patientResponse.setPatientAttatchments(fileService.getBySessionIdAndFileType(sessionId, FOR_PATIENT));
+            patientResponse.setPatientAttatchments(sessionFileService.getBySessionIdAndFileType(sessionId, FOR_PATIENT));
             response = patientResponse;
         } else {
             ProfessionalSessionResponse professionalResponse = new ProfessionalSessionResponse();
-            professionalResponse.setProfessionalAttatchments(fileService.getBySessionIdAndFileType(sessionId, FOR_PROFESSIONAL));
+            professionalResponse.setProfessionalAttatchments(sessionFileService.getBySessionIdAndFileType(sessionId, FOR_PROFESSIONAL));
             if (userService.isAlly(user, therapy)) {
                 professionalResponse.setProfessionalAttatchments(
                     professionalResponse.getProfessionalAttatchments().stream().filter(
@@ -127,7 +127,7 @@ public class SessionServiceImpl implements SessionService {
             }
             response = professionalResponse;
         }
-        response.setSharedAttatchments(fileService.getBySessionIdAndFileType(sessionId, SHARED));
+        response.setSharedAttatchments(sessionFileService.getBySessionIdAndFileType(sessionId, SHARED));
         m.map(session, response);
         /*
             TODO
@@ -151,20 +151,20 @@ public class SessionServiceImpl implements SessionService {
         if (request instanceof PatientSessionRequest patientRequest) {
             PatientSessionResponse patientResponse = new PatientSessionResponse();
             patientResponse.setPatientAttatchments(
-                fileService.updateSessionFiles(sessionId, patientRequest.getPatientAttatchments(), FOR_PATIENT)
+                sessionFileService.updateSessionFiles(sessionId, patientRequest.getPatientAttatchments(), FOR_PATIENT)
             );
             response = patientResponse;
 
         } else if (request instanceof ProfessionalSessionRequest professionalRequest) {
             ProfessionalSessionResponse professionalResponse = new ProfessionalSessionResponse();
             professionalResponse.setProfessionalAttatchments(
-                fileService.updateSessionFiles(sessionId, professionalRequest.getProfessionalAttatchments(), FOR_PROFESSIONAL)
+                sessionFileService.updateSessionFiles(sessionId, professionalRequest.getProfessionalAttatchments(), FOR_PROFESSIONAL)
             );
             response = professionalResponse;
         }
         if (response != null) {
             response.setSharedAttatchments(
-                    fileService.updateSessionFiles(sessionId, request.getSharedAttatchments(), SHARED)
+                    sessionFileService.updateSessionFiles(sessionId, request.getSharedAttatchments(), SHARED)
             );
         }
         save(session);
