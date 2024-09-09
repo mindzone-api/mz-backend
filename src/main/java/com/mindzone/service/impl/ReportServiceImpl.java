@@ -2,6 +2,7 @@ package com.mindzone.service.impl;
 
 import com.mindzone.dto.request.ReportRequest;
 import com.mindzone.dto.response.ReportResponse;
+import com.mindzone.dto.response.listed.ListedReportResponse;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.Report;
 import com.mindzone.model.ReportFile;
@@ -17,6 +18,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.mindzone.exception.ExceptionMessages.REPORT_NOT_FOUND;
 import static com.mindzone.exception.ExceptionMessages.USER_UNAUTHORIZED;
@@ -86,5 +88,14 @@ public class ReportServiceImpl implements ReportService {
         ReportResponse response = m.map(report, ReportResponse.class);
         response.setAttachments(fileService.getAll(reportId));
         return response;
+    }
+
+    @Override
+    public List<ListedReportResponse> getAll(User professional, String therapyId) {
+        Therapy therapy = therapyService.getById(therapyId);
+        canAccessReports(professional, therapy);
+        therapyService.isApproved(therapy);
+        List<Report> reports = reportRepository.findAllByTherapyId(therapyId);
+        return m.listMap(reports, ListedReportResponse.class);
     }
 }
