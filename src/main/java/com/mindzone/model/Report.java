@@ -15,11 +15,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Document(collection = "professional-report")
+@Document(collection = "report")
 public class Report extends AbstractModel implements Serializable {
 
     private String therapyId;
     private String title;
     private String content;
-    private List<ReportFile> attachments;
 }

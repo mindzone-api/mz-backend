@@ -5,7 +5,7 @@ import com.mindzone.model.therapy.SessionFile;
 
 import java.util.List;
 
-public interface FileService {
+public interface SessionFileService {
     void save(SessionFile model);
 
     List<SessionFile> updateSessionFiles(String sessionId, List<SessionFile> newSessionFiles, FileType fileType);

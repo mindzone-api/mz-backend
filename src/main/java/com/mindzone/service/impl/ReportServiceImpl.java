@@ -4,15 +4,20 @@ import com.mindzone.dto.request.ReportRequest;
 import com.mindzone.dto.response.ReportResponse;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.Report;
+import com.mindzone.model.ReportFile;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
+import com.mindzone.repository.ReportFileRepository;
 import com.mindzone.repository.ReportRepository;
+import com.mindzone.service.interfaces.ReportFileService;
 import com.mindzone.service.interfaces.ReportService;
 import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 import static com.mindzone.exception.ExceptionMessages.REPORT_NOT_FOUND;
 import static com.mindzone.exception.ExceptionMessages.USER_UNAUTHORIZED;
@@ -22,6 +27,7 @@ import static com.mindzone.exception.ExceptionMessages.USER_UNAUTHORIZED;
 public class ReportServiceImpl implements ReportService {
 
     private ReportRepository reportRepository;
+    private ReportFileService fileService;
     private UltimateModelMapper m;
     private UserService userService;
     private TherapyService therapyService;
@@ -60,6 +66,13 @@ public class ReportServiceImpl implements ReportService {
         therapyService.isActive(therapy);
         Report report = m.map(request, Report.class);
         save(report);
-        return m.map(report, ReportResponse.class);
+        ReportResponse response = m.map(report, ReportResponse.class);
+        response.setAttachments(new ArrayList<>());
+        for (ReportFile attachment : request.getAttachments()) {
+            attachment.setReportId(report.getId());
+            fileService.save(attachment);
+            response.getAttachments().add(attachment);
+        }
+        return response;
     }
 }
