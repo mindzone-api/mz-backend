@@ -1,4 +1,4 @@
-package com.mindzone.model.therapy;
+package com.mindzone.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

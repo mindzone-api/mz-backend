@@ -1,4 +1,4 @@
-package com.mindzone.model.therapy;
+package com.mindzone.model;
 
 import com.mindzone.model.AbstractModel;
 import lombok.AllArgsConstructor;
@@ -15,11 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Document(collection = "report")
+@Document(collection = "professional-report")
 public class Report extends AbstractModel implements Serializable {
 
     private String therapyId;
     private String title;
     private String content;
-    private List<File> attachments;
+    private List<ReportFile> attachments;
 }

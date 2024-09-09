@@ -1,7 +1,7 @@
 package com.mindzone.dto.response;
 
 import com.mindzone.model.therapy.SessionFile;
-import com.mindzone.model.therapy.Homework;
+import com.mindzone.model.Homework;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

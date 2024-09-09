@@ -1,6 +1,5 @@
-package com.mindzone.model.therapy;
+package com.mindzone.model;
 
-import com.mindzone.model.AbstractModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

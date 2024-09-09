@@ -3,7 +3,7 @@ package com.mindzone.service.impl;
 import com.mindzone.dto.request.ReportRequest;
 import com.mindzone.dto.response.ReportResponse;
 import com.mindzone.exception.ApiRequestException;
-import com.mindzone.model.therapy.Report;
+import com.mindzone.model.Report;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import com.mindzone.repository.ReportRepository;

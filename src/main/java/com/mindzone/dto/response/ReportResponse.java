@@ -1,5 +1,6 @@
 package com.mindzone.dto.response;
 
+import com.mindzone.model.ReportFile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,5 +16,5 @@ public class ReportResponse {
     private String therapyId;
     private String title;
     private String content;
-    private List<File> attachments;
+    private List<ReportFile> attachments;
 }

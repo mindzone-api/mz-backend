@@ -1,6 +1,6 @@
 package com.mindzone.repository;
 
-import com.mindzone.model.therapy.Prescription;
+import com.mindzone.model.Prescription;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
