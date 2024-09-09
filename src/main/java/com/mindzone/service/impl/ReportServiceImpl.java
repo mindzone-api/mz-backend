@@ -76,4 +76,15 @@ public class ReportServiceImpl implements ReportService {
         }
         return response;
     }
+
+    @Override
+    public ReportResponse get(User professional, String reportId) {
+        Report report = getById(reportId);
+        Therapy therapy = therapyService.getById(report.getTherapyId());
+        canAccessReports(professional, therapy);
+        therapyService.isApproved(therapy);
+        ReportResponse response = m.map(report, ReportResponse.class);
+        response.setAttachments(fileService.getAll(reportId));
+        return response;
+    }
 }

@@ -17,4 +17,6 @@ public interface ReportService {
     Report getById(String id);
 
     ReportResponse create(User professional, ReportRequest request);
+
+    ReportResponse get(User professional, String reportId);
 }

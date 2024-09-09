@@ -9,10 +9,7 @@ import com.mindzone.service.interfaces.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.mindzone.constants.Constants.V1;
 import static com.mindzone.enums.Role.PROFESSIONAL;
@@ -29,5 +26,11 @@ public class ReportController {
     public ResponseEntity<ReportResponse> create(JwtAuthenticationToken token, @RequestBody ReportRequest request) {
         User professional = userService.validate(token, PROFESSIONAL);
         return ResponseEntity.ok(reportService.create(professional, request));
+    }
+
+    @GetMapping("/{reportId}")
+    public ResponseEntity<ReportResponse> get(JwtAuthenticationToken token, @PathVariable String reportId) {
+        User professional = userService.validate(token, PROFESSIONAL);
+        return ResponseEntity.ok(reportService.get(professional, reportId));
     }
 }
