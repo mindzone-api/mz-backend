@@ -6,6 +6,7 @@ import com.mindzone.dto.request.PrescritionRequest;
 import com.mindzone.dto.response.PrescriptionResponse;
 import com.mindzone.dto.response.listed.ListedPrescription;
 import com.mindzone.model.Prescription;
+import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
 import org.springframework.data.domain.Page;
 
@@ -13,6 +14,10 @@ import java.util.List;
 
 public interface PrescriptionService {
     void save(Prescription model);
+
+    void canAccessPrescriptions(User user, Therapy therapy);
+
+    void canManagePrescriptions(User user, Therapy therapy);
 
     PrescriptionResponse create(User psychiatrist, PrescritionRequest request);
 
