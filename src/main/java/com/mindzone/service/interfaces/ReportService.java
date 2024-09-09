@@ -2,9 +2,12 @@ package com.mindzone.service.interfaces;
 
 import com.mindzone.dto.request.ReportRequest;
 import com.mindzone.dto.response.ReportResponse;
+import com.mindzone.dto.response.listed.ListedReportResponse;
 import com.mindzone.model.Report;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.User;
+
+import java.util.List;
 
 public interface ReportService {
 
@@ -19,4 +22,6 @@ public interface ReportService {
     ReportResponse create(User professional, ReportRequest request);
 
     ReportResponse get(User professional, String reportId);
+
+    List<ListedReportResponse> getAll(User professional, String therapyId);
 }
