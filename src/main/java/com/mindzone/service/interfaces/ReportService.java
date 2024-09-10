@@ -24,4 +24,6 @@ public interface ReportService {
     ReportResponse get(User professional, String reportId);
 
     List<ListedReportResponse> getAll(User professional, String therapyId);
+
+    ReportResponse update(User professional, String reportId, ReportRequest request);
 }

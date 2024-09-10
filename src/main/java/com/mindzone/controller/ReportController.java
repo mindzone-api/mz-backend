@@ -42,4 +42,14 @@ public class ReportController {
         User professional = userService.validate(token, PROFESSIONAL);
         return ResponseEntity.ok(reportService.getAll(professional, therapyId));
     }
+
+    @PutMapping("/{reportId}")
+    public ResponseEntity<ReportResponse> update(
+            JwtAuthenticationToken token,
+            @RequestBody ReportRequest request,
+            @PathVariable String reportId
+    ) {
+        User professional = userService.validate(token, PROFESSIONAL);
+        return ResponseEntity.ok(reportService.update(professional, reportId, request));
+    }
 }

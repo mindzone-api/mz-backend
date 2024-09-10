@@ -34,5 +34,6 @@ public class ExceptionMessages {
     // --------------- REPORT --------------- \\
 
     public static final String REPORT_NOT_FOUND = "REPORT_NOT_FOUND";
+    public static final String REPORT_FILE_NOT_FOUND = "REPORT_FILE_NOT_FOUND";
 
 }

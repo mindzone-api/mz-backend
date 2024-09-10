@@ -1,7 +1,7 @@
 package com.mindzone.model.therapy;
 
 import com.mindzone.enums.FileType;
-import com.mindzone.model.AbstractModel;
+import com.mindzone.model.File;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,11 +13,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Data
 @Builder
-public class SessionFile extends AbstractModel implements Serializable {
+public class SessionFile extends File implements Serializable {
 
-    private String name;
     private String sessionId;
     private FileType fileType;
-    private String content;
     private Boolean isMedicalRecord;
 }

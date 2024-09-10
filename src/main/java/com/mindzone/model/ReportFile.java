@@ -12,10 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Builder
-public class ReportFile extends AbstractModel implements Serializable {
+public class ReportFile extends File implements Serializable {
 
-    private String name;
     private String reportId;
-    private String content;
 }
