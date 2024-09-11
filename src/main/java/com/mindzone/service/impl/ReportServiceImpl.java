@@ -113,4 +113,19 @@ public class ReportServiceImpl implements ReportService {
         response.setAttachments(fileService.updateReportFiles(reportId, request.getAttachments()));
         return response;
     }
+
+    @Override
+    public ReportResponse delete(User professional, String reportId) {
+        Report report = getById(reportId);
+        Therapy therapy = therapyService.getById(report.getTherapyId());
+        canManageReports(professional, therapy);
+        therapyService.isActive(therapy);
+
+        reportRepository.delete(report);
+
+        ReportResponse response = m.map(report, ReportResponse.class);
+        response.setAttachments(fileService.getAll(reportId));
+        fileService.deleteAll(reportId);
+        return response;
+    }
 }
