@@ -66,6 +66,10 @@ public class ReportFileServiceImpl implements ReportFileService {
         return newReportFiles;
     }
 
+    @Override
+    public void deleteAll(String reportId) {
+        reportFileRepository.deleteAll(getAll(reportId));
+    }
 
 
 }

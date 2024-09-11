@@ -13,4 +13,6 @@ public interface ReportFileService {
     List<ReportFile> getAll(String reportId);
 
     List<ReportFile> updateReportFiles(String reportId, List<ReportFile> newReportFiles);
+
+    void deleteAll(String reportId);
 }

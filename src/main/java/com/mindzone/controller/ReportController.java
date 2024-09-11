@@ -52,4 +52,13 @@ public class ReportController {
         User professional = userService.validate(token, PROFESSIONAL);
         return ResponseEntity.ok(reportService.update(professional, reportId, request));
     }
+
+    @DeleteMapping("/{reportId}")
+    public ResponseEntity<ReportResponse> delete(
+            JwtAuthenticationToken token,
+            @PathVariable String reportId
+    ) {
+        User professional = userService.validate(token, PROFESSIONAL);
+        return ResponseEntity.ok(reportService.delete(professional, reportId));
+    }
 }
