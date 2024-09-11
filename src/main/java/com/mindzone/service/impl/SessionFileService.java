@@ -1,13 +1,21 @@
 package com.mindzone.service.impl;
 
 import com.mindzone.enums.FileType;
+import com.mindzone.exception.ApiRequestException;
+import com.mindzone.model.File;
+import com.mindzone.model.ReportFile;
 import com.mindzone.model.therapy.SessionFile;
 import com.mindzone.repository.SessionFileRepository;
+import com.mindzone.util.FileUtil;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.mindzone.exception.ExceptionMessages.SESSION_FILE_NOT_FOUND;
+import static com.mindzone.util.FileUtil.contains;
+import static com.mindzone.util.FileUtil.hasUpdated;
 
 @Service
 @AllArgsConstructor
@@ -23,31 +31,51 @@ public class SessionFileService implements com.mindzone.service.interfaces.Sessi
     }
 
     @Override
+    public SessionFile getById(String id) {
+        return sessionFileRepository.findById(id)
+                .orElseThrow(() -> new ApiRequestException(SESSION_FILE_NOT_FOUND));
+    }
+
+    @Override
     public List<SessionFile> updateSessionFiles(String sessionId, List<SessionFile> newSessionFiles, FileType fileType) {
-        List<SessionFile> sessionFiles = sessionFileRepository.findAllBySessionIdAndFileType(sessionId, fileType);
+        // FIXME
+        List<SessionFile> databaseFiles = sessionFileRepository.findAllBySessionIdAndFileType(sessionId, fileType);
 
-        // Deleting all files ocurrences that are not on the updated list
-        sessionFileRepository.deleteAll(sessionFiles.stream().filter(
-                file -> !newSessionFiles.contains(file)
-        ).toList());
+        // 1- Delete all files ocurrences that are on mongo and not on the updated list
+        for (SessionFile databaseFile : databaseFiles) {
 
+            if  (!contains(newSessionFiles, databaseFile)) {
+                sessionFileRepository.delete(databaseFile);
+            }
+        }
+
+        // 2- Update existing files with new data and update the updatedAt attribute
         for (SessionFile sessionFile : newSessionFiles) {
-            if (sessionFiles.contains(sessionFile)) { // comparing using only the id
-                SessionFile sessionFileOnList = sessionFiles.get(sessionFiles.indexOf(sessionFile)); // It is possible to retrieve the file because of its id
-                m.map(sessionFile, sessionFileOnList);
-                sessionFile = sessionFileOnList;
+            if (contains(databaseFiles, sessionFile)) { // comparing using only the id
+                SessionFile fileToUpdate = getById(sessionFile.getId());
+                if (this.hasUpdated(fileToUpdate, sessionFile)) {
+                    fileToUpdate.setName(sessionFile.getName());
+                    fileToUpdate.setContent(sessionFile.getContent());
+                    fileToUpdate.setIsMedicalRecord(sessionFile.getIsMedicalRecord());
+                    save(fileToUpdate);
+                    m.map(fileToUpdate, sessionFile);
+                }
             } else {
                 sessionFile.setSessionId(sessionId);
                 sessionFile.setFileType(fileType);
-                sessionFiles.add(sessionFile);
+                databaseFiles.add(sessionFile);
+                save(sessionFile);
             }
-            save(sessionFile);
         }
-        return sessionFiles;
+        return newSessionFiles;
     }
 
     @Override
     public List<SessionFile> getBySessionIdAndFileType(String sessionId, FileType fileType) {
         return sessionFileRepository.findAllBySessionIdAndFileType(sessionId, fileType);
+    }
+
+    private boolean hasUpdated(SessionFile oldFile, SessionFile newFile) {
+        return FileUtil.hasUpdated(oldFile, newFile) || !oldFile.getIsMedicalRecord().equals(newFile.getIsMedicalRecord());
     }
 }
