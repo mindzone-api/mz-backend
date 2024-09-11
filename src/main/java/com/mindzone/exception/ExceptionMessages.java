@@ -25,6 +25,7 @@ public class ExceptionMessages {
 
     public static final String SESSION_NOT_FOUND = "SESSION_NOT_FOUND";
     public static final String INVALID_NEXT_SESSION_DATE = "INVALID_NEXT_SESSION_DATE";
+    public static final String SESSION_FILE_NOT_FOUND = "SESSION_FILE_NOT_FOUND";
 
     // --------------- PRESCRIPTIONS --------------- \\
 
@@ -34,5 +35,6 @@ public class ExceptionMessages {
     // --------------- REPORT --------------- \\
 
     public static final String REPORT_NOT_FOUND = "REPORT_NOT_FOUND";
+    public static final String REPORT_FILE_NOT_FOUND = "REPORT_FILE_NOT_FOUND";
 
 }

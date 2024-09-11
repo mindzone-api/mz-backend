@@ -98,4 +98,19 @@ public class ReportServiceImpl implements ReportService {
         List<Report> reports = reportRepository.findAllByTherapyId(therapyId);
         return m.listMap(reports, ListedReportResponse.class);
     }
+
+    @Override
+    public ReportResponse update(User professional, String reportId, ReportRequest request) {
+        Report report = getById(reportId);
+        Therapy therapy = therapyService.getById(report.getTherapyId());
+        canManageReports(professional, therapy);
+        therapyService.isActive(therapy);
+
+        m.map(request, report);
+        save(report);
+
+        ReportResponse response = m.map(report, ReportResponse.class);
+        response.setAttachments(fileService.updateReportFiles(reportId, request.getAttachments()));
+        return response;
+    }
 }

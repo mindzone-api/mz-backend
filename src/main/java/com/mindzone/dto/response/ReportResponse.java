@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 public class ReportResponse {
 
+    private String id;
     private String therapyId;
     private String title;
     private String content;
