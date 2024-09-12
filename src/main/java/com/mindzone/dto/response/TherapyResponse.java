@@ -18,7 +18,7 @@ public class TherapyResponse {
     private String professionalId;
     private TherapyStatus therapyStatus;
     private boolean active;
-    private Date since;
+    private Date createdAt;
     private List<WeekDaySchedule> schedule;
     private String nextSessionId;
 }
