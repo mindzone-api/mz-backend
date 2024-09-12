@@ -3,6 +3,7 @@ package com.mindzone.service.impl;
 import com.mindzone.dto.request.QuestionnaireStatisticsRequest;
 import com.mindzone.dto.response.QuestionnaireStatisticsResponse;
 import com.mindzone.model.user.User;
+import com.mindzone.repository.QuestionnaireRepository;
 import com.mindzone.service.interfaces.QuestionnaireService;
 import com.mindzone.service.interfaces.QuestionnaireStatisticsService;
 import com.mindzone.service.interfaces.UserService;
@@ -15,6 +16,7 @@ public class QuestionnaireStatisticsServiceImpl implements QuestionnaireStatisti
 
     private QuestionnaireService q;
     private UserService userService;
+    private QuestionnaireRepository questionnaireRepository;
 
 
     @Override
