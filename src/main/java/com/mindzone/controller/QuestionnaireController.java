@@ -47,4 +47,20 @@ public class QuestionnaireController {
         User user = userService.validate(token);
         return ResponseEntity.ok(questionnaireService.getAll(user, userId, pageRequest));
     }
+
+    @PutMapping("/{questionnaireId}")
+    public ResponseEntity<QuestionnaireResponse> update(
+            JwtAuthenticationToken token,
+            @PathVariable String questionnaireId,
+            @RequestBody QuestionnaireRequest request
+    ) {
+        User patient = userService.validate(token, PATIENT);
+        return ResponseEntity.ok(questionnaireService.update(patient, questionnaireId, request));
+    }
+
+    @DeleteMapping("/{questionnaireId}")
+    public ResponseEntity<QuestionnaireResponse> delete(JwtAuthenticationToken token, @PathVariable String questionnaireId) {
+        User patient = userService.validate(token);
+        return ResponseEntity.ok(questionnaireService.delete(patient, questionnaireId));
+    }
 }

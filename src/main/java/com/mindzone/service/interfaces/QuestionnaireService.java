@@ -25,4 +25,8 @@ public interface QuestionnaireService {
     QuestionnaireResponse get(User user, String questionnaireId);
 
     Page<ListedQuestionnaire> getAll(User user, String userId, MzPageRequest pageRequest);
+
+    QuestionnaireResponse update(User patient, String questionnaireId, QuestionnaireRequest request);
+
+    QuestionnaireResponse delete(User patient, String questionnaireId);
 }
