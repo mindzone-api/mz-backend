@@ -107,4 +107,21 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         Page<Questionnaire> questionnaires = questionnaireRepository.findByPatientId(userId, pageable);
         return m.pageMap(questionnaires, ListedQuestionnaire.class);
     }
+
+    @Override
+    public QuestionnaireResponse update(User patient, String questionnaireId, QuestionnaireRequest request) {
+        Questionnaire questionnaire = getById(questionnaireId);
+        canManageQuestionnaire(patient, questionnaire);
+        m.map(request, questionnaire);
+        save(questionnaire);
+        return m.map(questionnaire, QuestionnaireResponse.class);
+    }
+
+    @Override
+    public QuestionnaireResponse delete(User patient, String questionnaireId) {
+        Questionnaire questionnaire = getById(questionnaireId);
+        canManageQuestionnaire(patient, questionnaire);
+        questionnaireRepository.delete(questionnaire);
+        return m.map(questionnaire, QuestionnaireResponse.class);
+    }
 }
