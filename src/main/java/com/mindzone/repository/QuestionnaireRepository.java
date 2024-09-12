@@ -1,6 +1,8 @@
 package com.mindzone.repository;
 
 import com.mindzone.model.Questionnaire;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -15,4 +17,6 @@ public interface QuestionnaireRepository extends MongoRepository<Questionnaire, 
             "{ $eq: [ { $dayOfMonth: '$createdAt' }, { $dayOfMonth: ?0 } ] } " +
             "] } }")
     Optional<Questionnaire> findByDate(Date date);
+
+    Page<Questionnaire> findByPatientId(String patientId, Pageable pageable);
 }
