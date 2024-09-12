@@ -15,8 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-import static com.mindzone.exception.ExceptionMessages.QUESTIONNAIRE_ALREADY_EXISTS;
-import static com.mindzone.exception.ExceptionMessages.QUESTIONNAIRE_NOT_FOUND;
+import static com.mindzone.enums.Role.PATIENT;
+import static com.mindzone.enums.Role.PROFESSIONAL;
+import static com.mindzone.exception.ExceptionMessages.*;
 
 @Service
 @AllArgsConstructor
@@ -24,6 +25,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
     private QuestionnaireRepository questionnaireRepository;
     private UltimateModelMapper m;
+    private TherapyService therapyService;
+    private UserService userService;
 
     @Override
     public void save(Questionnaire entity) {
@@ -38,12 +41,22 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
     @Override
     public void canAccessQuestionnaire(User user, Questionnaire questionnaire) {
-
+        if (user.getRole() == PATIENT) {
+            if (!questionnaire.getPatientId().equals(user.getId())) {
+                throw new ApiRequestException(USER_UNAUTHORIZED);
+            }
+        } else if (user.getRole() == PROFESSIONAL) {
+            if (!therapyService.hasActiveTherapy(user, userService.getById(questionnaire.getPatientId()))) {
+                throw new ApiRequestException(USER_UNAUTHORIZED);
+            }
+        }
     }
 
     @Override
     public void canManageQuestionnaire(User user, Questionnaire questionnaire) {
-
+        if (!questionnaire.getPatientId().equals(user.getId())) {
+            throw new ApiRequestException(USER_UNAUTHORIZED);
+        }
     }
 
     @Override
@@ -55,6 +68,13 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         Questionnaire questionnaire = m.map(request, Questionnaire.class);
         questionnaire.setPatientId(patient.getId());
         save(questionnaire);
+        return m.map(questionnaire, QuestionnaireResponse.class);
+    }
+
+    @Override
+    public QuestionnaireResponse get(User user, String questionnaireId) {
+        Questionnaire questionnaire = getById(questionnaireId);
+        canAccessQuestionnaire(user, questionnaire);
         return m.map(questionnaire, QuestionnaireResponse.class);
     }
 }

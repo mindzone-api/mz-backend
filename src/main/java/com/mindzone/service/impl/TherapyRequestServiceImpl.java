@@ -44,7 +44,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
         // Checking if patient already has a valid request with this professional
         // This check is not in the function below because it is also used on update therapy
         for (Therapy t : therapyRepository.findAllByPatientIdAndProfessionalId(patient.getId(), therapyRequest.getProfessionalId())) {
-            if (t.getTherapyStatus() == APPROVED || t.getTherapyStatus() == PENDING) {
+            if (t.getActive() || t.getTherapyStatus() == PENDING) {
                 throw new ApiRequestException(THERAPY_ALREADY_EXISTS);
             }
         }

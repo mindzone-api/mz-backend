@@ -45,4 +45,6 @@ public class TherapyController {
         User professional = userService.validate(token, PROFESSIONAL);
         return ResponseEntity.ok(therapyService.update(professional, id, therapyUpdate));
     }
+
+    // TODO: delete a therapy (make inactive)
 }
