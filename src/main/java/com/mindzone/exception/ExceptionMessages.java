@@ -37,4 +37,8 @@ public class ExceptionMessages {
     public static final String REPORT_NOT_FOUND = "REPORT_NOT_FOUND";
     public static final String REPORT_FILE_NOT_FOUND = "REPORT_FILE_NOT_FOUND";
 
+    // --------------- QUESTIONNARE --------------- \\
+
+    public static final String QUESTIONNAIRE_ALREADY_EXISTS = "QUESTIONNAIRE_ALREADY_EXISTS";
+    public static final String QUESTIONNAIRE_NOT_FOUND = "QUESTIONNAIRE_NOT_FOUND";
 }
