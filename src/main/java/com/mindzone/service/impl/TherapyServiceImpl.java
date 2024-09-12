@@ -47,6 +47,7 @@ public class TherapyServiceImpl implements TherapyService {
         if (!therapy.getPatientId().equals(user.getId()) && !therapy.getProfessionalId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
+        isApproved(therapy);
     }
 
     @Override
@@ -54,6 +55,7 @@ public class TherapyServiceImpl implements TherapyService {
         if (!therapy.getPatientId().equals(user.getId()) && !therapy.getProfessionalId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
+        isActive(therapy);
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.mindzone.model.therapy.Session;
 import com.mindzone.model.therapy.Therapy;
 import com.mindzone.model.user.ProfessionalInfo;
 import com.mindzone.model.user.User;
-import com.mindzone.model.user.WeekDaySchedule;
 import com.mindzone.repository.SessionRepository;
 import com.mindzone.repository.TherapyRepository;
 import com.mindzone.service.interfaces.MailService;
@@ -19,7 +18,6 @@ import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -68,9 +66,19 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
     }
 
     @Override
+    public void canManageRequest(User patient, Therapy therapy) {
+        if (
+                !therapy.getPatientId().equals(patient.getId()) &&
+                !therapy.getTherapyStatus().equals(PENDING)
+        ) {
+            throw new ApiRequestException(USER_UNAUTHORIZED);
+        }
+    }
+
+    @Override
     public TherapyResponse updateRequest(User patient, String id, TherapyRequest therapyRequest) {
         Therapy therapy = t.getById(id);
-        t.canManage(patient, therapy);
+        canManageRequest(patient, therapy);
         if (therapy.getTherapyStatus() != PENDING) {
             throw new ApiRequestException(THERAPY_IS_NOT_EDITABLE);
         }
@@ -83,7 +91,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
     @Override
     public TherapyResponse deleteRequest(User patient, String id) {
         Therapy therapy = t.getById(id);
-        t.canManage(patient, therapy);
+        canManageRequest(patient, therapy);
         if (therapy.getTherapyStatus() != PENDING) {
             throw new ApiRequestException(THERAPY_IS_NOT_EDITABLE);
         }
@@ -95,7 +103,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
     public TherapyResponse analyseRequest(User professional, String id, TherapyRequestAnalysis analysis) {
         Therapy therapy = t.getById(id);
         User patient = userService.getById(therapy.getPatientId());
-        t.canManage(professional, therapy);
+        canManageRequest(professional, therapy);
 
         if (analysis.getStatus() == DENIED) {
             // notify patient about professional final analysis
