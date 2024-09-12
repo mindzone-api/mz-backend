@@ -57,6 +57,7 @@ public class SessionServiceImpl implements SessionService {
         if (!therapy.getPatientId().equals(user.getId()) && !therapy.getProfessionalId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
+        therapyService.isApproved(therapy);
     }
 
     @Override
@@ -64,13 +65,13 @@ public class SessionServiceImpl implements SessionService {
         if (!therapy.getProfessionalId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
+        therapyService.isActive(therapy);
     }
 
     @Override
     public Page<ListedSession> getAll(User user, String therapyId, MzPageRequest mzPageRequest) {
         Therapy therapy = therapyService.getById(therapyId);
         canAccessSessions(user, therapy);
-        therapyService.isApproved(therapy);
         insertCompletedSessions(therapy);
 
         Sort sort = Sort.by(Sort.Direction.DESC, "date");
@@ -84,7 +85,6 @@ public class SessionServiceImpl implements SessionService {
     public TherapyResponse updateSchedule(User professional, String therapyId, TherapyScheduleUpdate update) {
         Therapy therapy = therapyService.getById(therapyId);
         canManageSessions(professional, therapy);
-        therapyService.isActive(therapy);
         insertCompletedSessions(therapy);
 
         if (!update.getSchedule().equals(therapy.getSchedule())) {
@@ -122,7 +122,6 @@ public class SessionServiceImpl implements SessionService {
         SessionResponse response;
         Therapy therapy = therapyService.getById(session.getTherapyId());
         canAccessSessions(user, therapy);
-        therapyService.isApproved(therapy);
 
 
         if (user.getRole() == PATIENT) {
@@ -157,7 +156,6 @@ public class SessionServiceImpl implements SessionService {
         SessionResponse response = null;
         Therapy therapy = therapyService.getById(session.getTherapyId());
         canManageSessions(user, therapy);
-        therapyService.isActive(therapy);
         m.map(request, session);
 
 

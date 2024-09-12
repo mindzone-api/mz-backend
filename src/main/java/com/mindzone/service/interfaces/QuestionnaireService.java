@@ -16,4 +16,6 @@ public interface QuestionnaireService {
     void canManageQuestionnaire(User user, Questionnaire questionnaire);
 
     QuestionnaireResponse create(User patient, QuestionnaireRequest request);
+
+    QuestionnaireResponse get(User user, String questionnaireId);
 }

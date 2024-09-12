@@ -13,12 +13,11 @@ import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.Date;
+
 import java.util.List;
 
 import static com.mindzone.constants.MailsBody.therapyUpdateMail;
 import static com.mindzone.enums.Role.PATIENT;
-import static com.mindzone.enums.Role.PROFESSIONAL;
 import static com.mindzone.enums.TherapyStatus.APPROVED;
 import static com.mindzone.exception.ExceptionMessages.*;
 
@@ -48,6 +47,7 @@ public class TherapyServiceImpl implements TherapyService {
         if (!therapy.getPatientId().equals(user.getId()) && !therapy.getProfessionalId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
+        isApproved(therapy);
     }
 
     @Override
@@ -55,6 +55,7 @@ public class TherapyServiceImpl implements TherapyService {
         if (!therapy.getPatientId().equals(user.getId()) && !therapy.getProfessionalId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
+        isActive(therapy);
     }
 
     @Override
@@ -76,6 +77,11 @@ public class TherapyServiceImpl implements TherapyService {
         Therapy therapy = getById(id);
         canAccess(user, therapy);
         return m.map(therapy, TherapyResponse.class);
+    }
+
+    @Override
+    public boolean hasActiveTherapy(User professional, User patient) {
+        return therapyRepository.findByProfessionalIdAndPatientIdAndActiveIsTrue(professional.getId(), patient.getId()).isPresent();
     }
 
     @Override

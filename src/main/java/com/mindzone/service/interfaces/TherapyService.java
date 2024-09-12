@@ -20,6 +20,9 @@ public interface TherapyService {
     void isActive(Therapy therapy);
 
     TherapyResponse get(User user, String id);
+
+    boolean hasActiveTherapy(User professional, User patient);
+
     List<ListedTherapy> getAll(User user);
     TherapyResponse update(User professional, String id, TherapyUpdate therapyUpdate);
 }

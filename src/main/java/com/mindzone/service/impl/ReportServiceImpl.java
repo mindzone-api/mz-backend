@@ -47,6 +47,7 @@ public class ReportServiceImpl implements ReportService {
         ) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
+        therapyService.isApproved(therapy);
     }
 
     @Override
@@ -54,6 +55,7 @@ public class ReportServiceImpl implements ReportService {
         if (!therapy.getProfessionalId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
         }
+        therapyService.isActive(therapy);
     }
 
     @Override
@@ -66,7 +68,6 @@ public class ReportServiceImpl implements ReportService {
     public ReportResponse create(User professional, ReportRequest request) {
         Therapy therapy = therapyService.getById(request.getTherapyId());
         canManageReports(professional, therapy);
-        therapyService.isActive(therapy);
         Report report = m.map(request, Report.class);
         save(report);
         ReportResponse response = m.map(report, ReportResponse.class);
@@ -84,7 +85,6 @@ public class ReportServiceImpl implements ReportService {
         Report report = getById(reportId);
         Therapy therapy = therapyService.getById(report.getTherapyId());
         canAccessReports(professional, therapy);
-        therapyService.isApproved(therapy);
         ReportResponse response = m.map(report, ReportResponse.class);
         response.setAttachments(fileService.getAll(reportId));
         return response;
@@ -94,7 +94,6 @@ public class ReportServiceImpl implements ReportService {
     public List<ListedReportResponse> getAll(User professional, String therapyId) {
         Therapy therapy = therapyService.getById(therapyId);
         canAccessReports(professional, therapy);
-        therapyService.isApproved(therapy);
         List<Report> reports = reportRepository.findAllByTherapyId(therapyId);
         return m.listMap(reports, ListedReportResponse.class);
     }
@@ -104,7 +103,6 @@ public class ReportServiceImpl implements ReportService {
         Report report = getById(reportId);
         Therapy therapy = therapyService.getById(report.getTherapyId());
         canManageReports(professional, therapy);
-        therapyService.isActive(therapy);
 
         m.map(request, report);
         save(report);
@@ -119,7 +117,6 @@ public class ReportServiceImpl implements ReportService {
         Report report = getById(reportId);
         Therapy therapy = therapyService.getById(report.getTherapyId());
         canManageReports(professional, therapy);
-        therapyService.isActive(therapy);
 
         reportRepository.delete(report);
 
