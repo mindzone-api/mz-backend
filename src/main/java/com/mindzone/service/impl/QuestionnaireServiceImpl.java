@@ -1,7 +1,9 @@
 package com.mindzone.service.impl;
 
+import com.mindzone.dto.request.MzPageRequest;
 import com.mindzone.dto.request.QuestionnaireRequest;
 import com.mindzone.dto.response.QuestionnaireResponse;
+import com.mindzone.dto.response.listed.ListedQuestionnaire;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.Questionnaire;
 import com.mindzone.model.user.User;
@@ -11,6 +13,10 @@ import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -53,6 +59,19 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
+    public void canAccessQuestionnaire(User userAsking, User userToAccess) {
+        if (userAsking.getRole() == PATIENT) {
+            if (!userAsking.getId().equals(userToAccess.getId())) {
+                throw new ApiRequestException(USER_UNAUTHORIZED);
+            }
+        } else if (userAsking.getRole() == PROFESSIONAL) {
+            if (!therapyService.hasActiveTherapy(userAsking, userToAccess)) {
+                throw new ApiRequestException(USER_UNAUTHORIZED);
+            }
+        }
+    }
+
+    @Override
     public void canManageQuestionnaire(User user, Questionnaire questionnaire) {
         if (!questionnaire.getPatientId().equals(user.getId())) {
             throw new ApiRequestException(USER_UNAUTHORIZED);
@@ -76,5 +95,16 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         Questionnaire questionnaire = getById(questionnaireId);
         canAccessQuestionnaire(user, questionnaire);
         return m.map(questionnaire, QuestionnaireResponse.class);
+    }
+
+    @Override
+    public Page<ListedQuestionnaire> getAll(User user, String userId, MzPageRequest pageRequest) {
+        User userToAccess = userService.getById(userId);
+        canAccessQuestionnaire(user, userToAccess);
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(), sort);
+        Page<Questionnaire> questionnaires = questionnaireRepository.findByPatientId(userId, pageable);
+        return m.pageMap(questionnaires, ListedQuestionnaire.class);
     }
 }

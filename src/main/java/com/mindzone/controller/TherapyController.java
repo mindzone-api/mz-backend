@@ -24,10 +24,10 @@ public class TherapyController {
     private UserService userService;
     private TherapyService therapyService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TherapyResponse> get(JwtAuthenticationToken token, @PathVariable String id) {
+    @GetMapping("/{therapyId}")
+    public ResponseEntity<TherapyResponse> get(JwtAuthenticationToken token, @PathVariable String therapyId) {
         User user = userService.validate(token);
-        return ResponseEntity.ok(therapyService.get(user, id));
+        return ResponseEntity.ok(therapyService.get(user, therapyId));
     }
 
     @GetMapping("/get-all")
@@ -36,15 +36,21 @@ public class TherapyController {
         return ResponseEntity.ok(therapyService.getAll(user));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{therapyId}")
     public ResponseEntity<TherapyResponse> update(
             JwtAuthenticationToken token,
-            @PathVariable String id,
+            @PathVariable String therapyId,
             @RequestBody TherapyUpdate therapyUpdate
     ) {
         User professional = userService.validate(token, PROFESSIONAL);
-        return ResponseEntity.ok(therapyService.update(professional, id, therapyUpdate));
+        return ResponseEntity.ok(therapyService.update(professional, therapyId, therapyUpdate));
     }
 
     // TODO: delete a therapy (make inactive)
+
+    @DeleteMapping("/{therapyId}")
+    public ResponseEntity<TherapyResponse> cancel(JwtAuthenticationToken token, @PathVariable String therapyId) {
+        User user = userService.validate(token);
+        return ResponseEntity.ok(therapyService.cancel(user, therapyId));
+    }
 }

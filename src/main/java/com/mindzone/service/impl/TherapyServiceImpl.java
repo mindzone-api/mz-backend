@@ -107,4 +107,13 @@ public class TherapyServiceImpl implements TherapyService {
         );
         return m.map(therapy, TherapyResponse.class);
     }
+
+    @Override
+    public TherapyResponse cancel(User user, String therapyId) {
+        Therapy therapy = getById(therapyId);
+        canManage(user, therapy);
+        therapy.setActive(false);
+        save(therapy);
+        return m.map(therapy, TherapyResponse.class);
+    }
 }

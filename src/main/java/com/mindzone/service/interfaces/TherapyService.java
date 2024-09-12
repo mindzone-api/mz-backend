@@ -25,4 +25,6 @@ public interface TherapyService {
 
     List<ListedTherapy> getAll(User user);
     TherapyResponse update(User professional, String id, TherapyUpdate therapyUpdate);
+
+    TherapyResponse cancel(User user, String therapyId);
 }
