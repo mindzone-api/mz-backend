@@ -151,7 +151,6 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
 
             // update and save
             therapy.setTherapyStatus(analysis.getStatus());
-            therapy.setSince(new Date());
             therapy.setUrl(analysis.getApprovalSessionsUrl());
             therapy.setActive(true);
 
