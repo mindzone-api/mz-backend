@@ -163,6 +163,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
             session.setUpdatedAt(now);
             sessionRepository.save(session);
             therapy.setNextSessionId(session.getId());
+            therapy.setSince(now);
             t.save(therapy);
 
             // notify patient about professional final analysis

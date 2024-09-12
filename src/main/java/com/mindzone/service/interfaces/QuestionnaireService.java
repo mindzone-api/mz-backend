@@ -2,7 +2,9 @@ package com.mindzone.service.interfaces;
 
 import com.mindzone.dto.request.MzPageRequest;
 import com.mindzone.dto.request.QuestionnaireRequest;
+import com.mindzone.dto.request.QuestionnaireStatisticsRequest;
 import com.mindzone.dto.response.QuestionnaireResponse;
+import com.mindzone.dto.response.QuestionnaireStatisticsResponse;
 import com.mindzone.dto.response.listed.ListedQuestionnaire;
 import com.mindzone.model.Questionnaire;
 import com.mindzone.model.user.User;

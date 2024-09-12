@@ -144,8 +144,7 @@ public class SessionServiceImpl implements SessionService {
         m.map(session, response);
         /*
             TODO
-           1- questionnaires statistics -> An endpoint will be built to calculate statistics based on requested and sessions date
-           2- homework state -> get it from the creation date
+           1- homework state -> get it from the creation date
         */
         return response;
     }
