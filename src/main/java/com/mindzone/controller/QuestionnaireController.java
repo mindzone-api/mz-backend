@@ -2,10 +2,13 @@ package com.mindzone.controller;
 
 import com.mindzone.dto.request.MzPageRequest;
 import com.mindzone.dto.request.QuestionnaireRequest;
+import com.mindzone.dto.request.QuestionnaireStatisticsRequest;
 import com.mindzone.dto.response.QuestionnaireResponse;
+import com.mindzone.dto.response.QuestionnaireStatisticsResponse;
 import com.mindzone.dto.response.listed.ListedQuestionnaire;
 import com.mindzone.model.user.User;
 import com.mindzone.service.interfaces.QuestionnaireService;
+import com.mindzone.service.interfaces.QuestionnaireStatisticsService;
 import com.mindzone.service.interfaces.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +20,7 @@ import java.util.List;
 
 import static com.mindzone.constants.Constants.V1;
 import static com.mindzone.enums.Role.PATIENT;
+import static com.mindzone.enums.Role.PROFESSIONAL;
 
 @RestController
 @AllArgsConstructor
@@ -25,6 +29,7 @@ public class QuestionnaireController {
 
     private UserService userService;
     private QuestionnaireService questionnaireService;
+    private QuestionnaireStatisticsService questionnaireStatisticsService;
 
     @PostMapping
     public ResponseEntity<QuestionnaireResponse> create(JwtAuthenticationToken token, @RequestBody QuestionnaireRequest request) {
@@ -62,5 +67,15 @@ public class QuestionnaireController {
     public ResponseEntity<QuestionnaireResponse> delete(JwtAuthenticationToken token, @PathVariable String questionnaireId) {
         User patient = userService.validate(token);
         return ResponseEntity.ok(questionnaireService.delete(patient, questionnaireId));
+    }
+
+    @GetMapping("statistics/{userId}")
+    public ResponseEntity<QuestionnaireStatisticsResponse> getStatistics(
+            JwtAuthenticationToken token,
+            @PathVariable String userId,
+            @RequestBody QuestionnaireStatisticsRequest request
+    ) {
+        User professional = userService.validate(token, PROFESSIONAL);
+        return ResponseEntity.ok(questionnaireStatisticsService.getStatistics(professional, userId, request));
     }
 }

@@ -16,6 +16,7 @@ public class TherapyResponse {
     private String id;
     private String patientId;
     private String professionalId;
+    private Date since;
     private TherapyStatus therapyStatus;
     private boolean active;
     private Date createdAt;

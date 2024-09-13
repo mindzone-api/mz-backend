@@ -25,6 +25,7 @@ public class Therapy extends AbstractModel implements Serializable {
 
     private String patientId;
     private String professionalId;
+    private Date since;
     private TherapyModality therapyModality;
     private TherapyStatus therapyStatus;
     private String url;
