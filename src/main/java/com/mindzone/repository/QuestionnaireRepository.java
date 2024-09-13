@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 public interface QuestionnaireRepository extends MongoRepository<Questionnaire, String> {
@@ -19,4 +20,7 @@ public interface QuestionnaireRepository extends MongoRepository<Questionnaire, 
     Optional<Questionnaire> findByDate(Date date);
 
     Page<Questionnaire> findByPatientId(String patientId, Pageable pageable);
+    @Query(value = "{}", sort = "{ 'dateField' : 1 }")
+    Optional<Questionnaire> findOldest();
+    List<Questionnaire> findAllByCreatedAtBetween(Date from, Date until);
 }

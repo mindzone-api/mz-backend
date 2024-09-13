@@ -11,7 +11,5 @@ public class QuestionnaireStatisticsResponse {
 
     private Double avgMoodBetweenDates;
     private Double overallAvgMood;
-    private Double medianMoodBetweenDates;
-    private Double overallMedianMood;
 
 }
