@@ -41,4 +41,9 @@ public class ExceptionMessages {
 
     public static final String QUESTIONNAIRE_ALREADY_EXISTS = "QUESTIONNAIRE_ALREADY_EXISTS";
     public static final String QUESTIONNAIRE_NOT_FOUND = "QUESTIONNAIRE_NOT_FOUND";
+
+    // --------------- CHAT --------------- \\
+
+    public static final String INVALID_CHAT = "INVALID_CHAT";
+    public static final String CHAT_NOT_FOUND = "CHAT_NOT_FOUND";
 }
