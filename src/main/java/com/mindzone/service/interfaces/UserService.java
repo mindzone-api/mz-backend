@@ -30,6 +30,8 @@ public interface UserService {
 
     boolean isAlly(User professional, Therapy therapy);
 
+    boolean isAlly(User u1, User u2);
+
     Page<ListedProfessional> search(SearchFilter filter);
     User getById(String id);
     void save(User user);

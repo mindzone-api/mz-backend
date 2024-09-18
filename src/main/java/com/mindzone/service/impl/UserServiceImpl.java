@@ -19,7 +19,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-import java.util.Date;
+
 import java.util.List;
 
 import static com.mindzone.constants.Constants.EMPTY;
@@ -125,6 +125,19 @@ public class UserServiceImpl implements UserService {
         List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndActiveIsTrue(therapy.getPatientId());
         for (Therapy patientTherapy : patientTherapies) {
             if (professional.getId().equals(patientTherapy.getProfessionalId()) && !therapy.equals(patientTherapy)) {
+                isAlly = true;
+                break;
+            }
+        }
+        return isAlly;
+    }
+
+    @Override
+    public boolean isAlly(User u1, User u2) {
+        boolean isAlly = false;
+        List<Therapy> u1Therapies = therapyRepository.findAllByProfessionalIdAndActiveIsTrue(u1.getId());
+        for (Therapy u1Therapy : u1Therapies) {
+            if (therapyRepository.findByProfessionalIdAndPatientIdAndActiveIsTrue(u2.getId(), u1Therapy.getPatientId()).isPresent()) {
                 isAlly = true;
                 break;
             }

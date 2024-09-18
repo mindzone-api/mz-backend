@@ -69,13 +69,13 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public Page<ListedSession> getAll(User user, String therapyId, MzPageRequest mzPageRequest) {
+    public Page<ListedSession> getAll(User user, String therapyId, MzPageRequest pageRequest) {
         Therapy therapy = therapyService.getById(therapyId);
         canAccessSessions(user, therapy);
         insertCompletedSessions(therapy);
 
         Sort sort = Sort.by(Sort.Direction.DESC, "date");
-        Pageable pageable = PageRequest.of(mzPageRequest.getPage(), mzPageRequest.getSize(), sort);
+        Pageable pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(), sort);
         Page<Session> sessions = sessionRepository.findByTherapyId(therapyId, pageable);
 
         return m.pageMap(sessions, ListedSession.class);
@@ -142,10 +142,6 @@ public class SessionServiceImpl implements SessionService {
         }
         response.setSharedAttatchments(sessionFileService.getBySessionIdAndFileType(sessionId, SHARED));
         m.map(session, response);
-        /*
-            TODO
-           1- homework state -> get it from the creation date
-        */
         return response;
     }
 
