@@ -1,5 +1,7 @@
 package com.mindzone.controller;
 
+import com.mindzone.dto.request.ChatMessageRequest;
+import com.mindzone.dto.response.ChatMessageResponse;
 import com.mindzone.dto.response.ChatResponse;
 import com.mindzone.dto.request.MzPageRequest;
 import com.mindzone.dto.response.listed.ListedChat;
@@ -11,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.mindzone.constants.Constants.V1;
 
@@ -32,5 +36,25 @@ public class ChatController {
     public ResponseEntity<Page<ListedChat>> getHistory(JwtAuthenticationToken token, @RequestBody MzPageRequest pageRequest) {
         User user = userService.validate(token);
         return ResponseEntity.ok(chatService.getHistory(user, pageRequest));
+    }
+
+    @PutMapping("/{chatId}")
+    public ResponseEntity<ChatMessageResponse> sendMessage(
+            JwtAuthenticationToken token,
+            @PathVariable String chatId,
+            @RequestBody ChatMessageRequest request
+    ) throws Exception {
+        User user = userService.validate(token);
+        return ResponseEntity.ok(chatService.sendMessage(user, chatId, request));
+    }
+
+    @GetMapping("/messages/{chatId}")
+    public ResponseEntity<Page<ChatMessageResponse>> getMessageHistory(
+            JwtAuthenticationToken token,
+            @PathVariable String chatId,
+            @RequestBody MzPageRequest pageRequest
+    ) {
+        User user = userService.validate(token);
+        return ResponseEntity.ok(chatService.getMessageHistory(user, chatId, pageRequest));
     }
 }
