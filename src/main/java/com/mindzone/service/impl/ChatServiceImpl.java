@@ -1,10 +1,13 @@
 package com.mindzone.service.impl;
 
+import com.mindzone.dto.request.ChatMessageRequest;
+import com.mindzone.dto.response.ChatMessageResponse;
 import com.mindzone.dto.response.ChatResponse;
 import com.mindzone.dto.request.MzPageRequest;
 import com.mindzone.dto.response.listed.ListedChat;
 import com.mindzone.exception.ApiRequestException;
 import com.mindzone.model.chat.Chat;
+import com.mindzone.model.chat.Message;
 import com.mindzone.model.user.User;
 import com.mindzone.repository.ChatRepository;
 import com.mindzone.service.interfaces.ChatService;
@@ -12,20 +15,16 @@ import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.*;
 
 import static com.mindzone.enums.Role.PATIENT;
 import static com.mindzone.enums.Role.PROFESSIONAL;
-import static com.mindzone.exception.ExceptionMessages.CHAT_NOT_FOUND;
-import static com.mindzone.exception.ExceptionMessages.INVALID_CHAT;
+import static com.mindzone.exception.ExceptionMessages.*;
+import static com.mindzone.util.ChatUtil.decrypt;
+import static com.mindzone.util.ChatUtil.encrypt;
 
 @AllArgsConstructor
 @Service
@@ -80,5 +79,57 @@ public class ChatServiceImpl implements ChatService {
         Pageable pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(), sort);
         Page<Chat> chats = chatRepository.findByUsersIdsContaining(user.getId(), pageable);
         return m.pageMap(chats, ListedChat.class);
+    }
+
+    @Override
+    public ChatMessageResponse sendMessage(User user, String chatId, ChatMessageRequest request) throws Exception {
+         Chat chat = getById(chatId);
+         if (!chat.getUsersIds().contains(user.getId())) {
+             throw new ApiRequestException(USER_UNAUTHORIZED);
+         }
+
+         Message message = new Message(user.getId(), encrypt(request.getContent()), new Date());
+         chat.getMessages().add(message);
+         save(chat);
+         message.setContent(request.getContent());
+         return m.map(message, ChatMessageResponse.class);
+    }
+
+    @Override
+    public Page<ChatMessageResponse> getMessageHistory(User user, String chatId, MzPageRequest pageRequest) {
+        Chat chat = getById(chatId);
+        if (!chat.getUsersIds().contains(user.getId())) {
+            throw new ApiRequestException(USER_UNAUTHORIZED);
+        }
+
+        Pageable pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize());
+
+        Page<Message> messages = getPage(chat.getMessages(), pageable);
+        messages.getContent().forEach(m -> {
+            try {
+                m.setContent(decrypt(m.getContent()));
+            } catch (Exception e) {
+                throw new ApiRequestException(ERROR_IN_MESSAGES_DECRYPT);
+            }
+        });
+
+        return m.pageMap(messages, ChatMessageResponse.class);
+    }
+
+
+    private static <T> Page<T> getPage(List<T> list, Pageable pageable) {
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<T> pageContent;
+
+        if (list.size() < startItem) {
+            pageContent = new ArrayList<>(); // Return an empty list if out of bounds
+        } else {
+            int toIndex = Math.min(startItem + pageSize, list.size());
+            pageContent = list.subList(startItem, toIndex);
+        }
+
+        return new PageImpl<>(pageContent, pageable, list.size());
     }
 }

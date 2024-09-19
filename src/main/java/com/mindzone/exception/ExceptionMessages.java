@@ -46,4 +46,5 @@ public class ExceptionMessages {
 
     public static final String INVALID_CHAT = "INVALID_CHAT";
     public static final String CHAT_NOT_FOUND = "CHAT_NOT_FOUND";
+    public static final String ERROR_IN_MESSAGES_DECRYPT = "ERROR_IN_MESSAGES_DECRYPT";
 }
