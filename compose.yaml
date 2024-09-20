@@ -1,13 +1,26 @@
+version: '3'
 services:
+  mz-backend:
+    build: .
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - mongodb
+      - rabbitmq
+      - redis
+
   mongodb:
     image: 'mongo:latest'
     ports:
       - '27017:27017'
+
   rabbitmq:
     image: 'rabbitmq:3.13.0-management'
     ports:
       - '5672:5672'
       - '15672:15672'
+
   redis:
     image: 'redis:latest'
     ports:
