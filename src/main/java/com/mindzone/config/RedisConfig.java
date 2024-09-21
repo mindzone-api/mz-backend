@@ -15,11 +15,9 @@ import java.time.Duration;
 @Configuration
 public class RedisConfig {
 
-    @Value("${redis.host}")
-    private String redisHost;
 
-    @Value("${redis.port}")
-    private int redisPort;
+    private final String redisHost = System.getenv("REDIS_HOST");
+    private final int redisPort =6379;
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
