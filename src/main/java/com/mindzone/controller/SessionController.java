@@ -53,7 +53,7 @@ public class SessionController {
         return ResponseEntity.ok(sessionService.get(user, sessionId));
     }
 
-    @PutMapping("/professional/{sessionId}")
+    @PutMapping("/{sessionId}")
     public ResponseEntity<SessionResponse> update(
             JwtAuthenticationToken token,
             @PathVariable String sessionId,
