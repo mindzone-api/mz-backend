@@ -17,10 +17,10 @@ public class RedisConfig {
 
 
     private final String redisHost = System.getenv("REDIS_HOST");
-    private final int redisPort =6379;
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
+        int redisPort = 6379;
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(redisHost, redisPort);
 
         return new LettuceConnectionFactory(configuration);
@@ -32,7 +32,12 @@ public class RedisConfig {
 
         return RedisCacheManager.builder(redisConnectionFactory())
                 .cacheDefaults(cacheConfig)
-                .withCacheConfiguration("user", myDefaultCacheConfig(Duration.ofMinutes(5)))
+                .withCacheConfiguration("user", myDefaultCacheConfig(Duration.ofMinutes(20)))
+                .withCacheConfiguration("chat", myDefaultCacheConfig(Duration.ofMinutes(20)))
+                .withCacheConfiguration("prescription", myDefaultCacheConfig(Duration.ofMinutes(10)))
+                .withCacheConfiguration("questionnaire", myDefaultCacheConfig(Duration.ofMinutes(10)))
+                .withCacheConfiguration("report", myDefaultCacheConfig(Duration.ofMinutes(10)))
+                .withCacheConfiguration("therapy", myDefaultCacheConfig(Duration.ofMinutes(15)))
                 .build();
     }
 

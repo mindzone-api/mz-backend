@@ -15,6 +15,7 @@ import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -81,6 +82,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    @Cacheable("report")
     public ReportResponse get(User professional, String reportId) {
         Report report = getById(reportId);
         Therapy therapy = therapyService.getById(report.getTherapyId());
@@ -91,6 +93,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    @Cacheable("report")
     public List<ListedReportResponse> getAll(User professional, String therapyId) {
         Therapy therapy = therapyService.getById(therapyId);
         canAccessReports(professional, therapy);
