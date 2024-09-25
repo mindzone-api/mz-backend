@@ -18,3 +18,5 @@ RUN ./mvnw clean package
 
 EXPOSE 8080 8081
 CMD java -jar /app/mz-mail-service/target/*.jar & java -jar /app/mz-backend/target/*.jar
+
+# docker build . --build-arg MONGODB_URI=$MONGODB_URI --build-arg RABBITMQ_URI=$RABBITMQ_URI --build-arg GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID --build-arg GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET

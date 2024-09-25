@@ -1,40 +1,39 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:java:.
 version: 2.1
+
 jobs:
-  test-java:
+  build_and_push:
     docker:
-      - image: cimg/openjdk:17.0
+      - image: cimg/base:2023.03
     steps:
       - checkout
       - run:
-          name: Calculate cache key
-          command: |-
-            find . -name 'pom.xml' -o -name 'gradlew*' -o -name '*.gradle*' | \
-                    sort | xargs cat > /tmp/CIRCLECI_CACHE_KEY
-      - restore_cache:
-          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
+          name: run redis
+          command: |
+            docker run -d --name redis -p 6379:6379 redis:alpine
       - run:
-          command: mvn verify
-      - store_test_results:
-          path: target/surefire-reports
-      - save_cache:
-          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
-          paths:
-            - ~/.m2/repository
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
-    steps:
-      # Replace this with steps to deploy to users
+          name: build image
+          command: |
+            docker build \
+              --build-arg CHAT_MESSAGE_ENCRYPTION_KEY=$CHAT_MESSAGE_ENCRYPTION_KEY \
+              --build-arg GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
+              --build-arg GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
+              --build-arg MONGODB_URI=$MONGODB_URI \
+              --build-arg RABBITMQ_URI=$RABBITMQ_URI \
+              --build-arg REDIS_HOST=$REDIS_HOST \
+              -t viniciussousaazevedo/mz-backend:latest .
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: push image
+          command: |
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            docker push viniciussousaazevedo/mz-backend:latest
+
 workflows:
-  build-and-test:
+  build_and_deploy:
     jobs:
-      - test-java
-    # - deploy:
-    #     requires:
-    #       - test-java
+      - build_and_push:
+          context: backend secrets
+          filters:
+            branches:
+              only:
+                - main
+                - circleci-project-setup
