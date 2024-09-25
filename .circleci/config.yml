@@ -41,6 +41,7 @@ workflows:
                 - main
                 - circleci-project-setup
       - docker/publish:
+          context: backend secrets
           image: viniciussousaazevedo/mz-backend:latest
           requires:
             - build
