@@ -32,8 +32,9 @@ jobs:
       - run:
           name: push image
           command: |
-            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
             docker push viniciussousaazevedo/mz-backend:latest
+
 
 workflows:
   build_and_deploy:
