@@ -15,7 +15,6 @@ import com.mindzone.repository.SessionRepository;
 import com.mindzone.service.interfaces.*;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -70,7 +69,6 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    @Cacheable("therapy")
     public Page<ListedSession> getAll(User user, String therapyId, MzPageRequest pageRequest) {
         Therapy therapy = therapyService.getById(therapyId);
         canAccessSessions(user, therapy);
@@ -119,7 +117,6 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    @Cacheable("therapy")
     public SessionResponse get(User user, String sessionId) {
         Session session = getById(sessionId);
         SessionResponse response;

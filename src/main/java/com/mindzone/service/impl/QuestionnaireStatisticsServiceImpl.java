@@ -10,7 +10,6 @@ import com.mindzone.service.interfaces.QuestionnaireService;
 import com.mindzone.service.interfaces.QuestionnaireStatisticsService;
 import com.mindzone.service.interfaces.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -28,7 +27,6 @@ public class QuestionnaireStatisticsServiceImpl implements QuestionnaireStatisti
 
 
     @Override
-    @Cacheable("questionnaire")
     public QuestionnaireStatisticsResponse getStatistics(User professional, String userId, QuestionnaireStatisticsRequest request) {
         User patient = userService.getById(userId);
         q.canAccessQuestionnaire(professional, patient);

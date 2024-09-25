@@ -12,7 +12,6 @@ import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -74,7 +73,6 @@ public class TherapyServiceImpl implements TherapyService {
     }
 
     @Override
-    @Cacheable("therapy")
     public TherapyResponse get(User user, String id) {
         Therapy therapy = getById(id);
         canAccess(user, therapy);
@@ -87,7 +85,6 @@ public class TherapyServiceImpl implements TherapyService {
     }
 
     @Override
-    @Cacheable("therapy")
     public List<ListedTherapy> getAll(User user) {
         return (
                 user.getRole() == PATIENT ?

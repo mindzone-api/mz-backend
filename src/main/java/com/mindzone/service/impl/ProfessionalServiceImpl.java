@@ -13,7 +13,6 @@ import com.mindzone.service.interfaces.ProfessionalService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.mindzone.dto.response.listed.ListedAlly;
 import java.util.ArrayList;
@@ -33,7 +32,6 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     private MailService mailService;
     private UserService userService;
     @Override
-    @Cacheable("user")
     public List<ListedPatient> getMyPatients(User user) {
         List<Therapy> therapies = therapyRepository.findAllByProfessionalIdAndTherapyStatus(user.getId(), APPROVED);
         List<ListedPatient> patients = new ArrayList<>();
@@ -47,7 +45,6 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     }
 
     @Override
-    @Cacheable("user")
     public List<ListedAlly> getMyAllies(User user) {
         List<Therapy> therapies = therapyRepository.findAllByProfessionalIdAndTherapyStatus(user.getId(), APPROVED);
         List<ListedAlly> allies = new ArrayList<>();
@@ -76,7 +73,6 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     }
 
     @Override
-    @Cacheable("user")
     public List<ListedTherapy> getMyAlliesTherapies(User professional) {
         List<ListedTherapy> response = new ArrayList<>();
 
