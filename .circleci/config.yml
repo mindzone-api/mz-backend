@@ -22,12 +22,14 @@ jobs:
           name: build image
           command: |
             docker build \
-              --build-arg CHAT_MESSAGE_ENCRYPTION_KEY=$CHAT_MESSAGE_ENCRYPTION_KEY \
-              --build-arg GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
-              --build-arg GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
-              --build-arg MONGODB_URI=$MONGODB_URI \
-              --build-arg RABBITMQ_URI=$RABBITMQ_URI \
-              --build-arg REDIS_HOST=$REDIS_HOST \
+              --build-arg CHAT_MESSAGE_ENCRYPTION_KEY="$CHAT_MESSAGE_ENCRYPTION_KEY" \
+              --build-arg GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
+              --build-arg GOOGLE_CLIENT_SECRET="$GOOGLE_CLIENT_SECRET" \
+              --build-arg MONGODB_URI="$MONGODB_URI" \
+              --build-arg RABBITMQ_URI="$RABBITMQ_URI" \
+              --build-arg REDIS_HOST="$REDIS_HOST" \
+              --build-arg MZ_MAIL_USERNAME="$MZ_MAIL_USERNAME" \
+              --build-arg MZ_MAIL_PASSWORD="$MZ_MAIL_PASSWORD" \
               -t viniciussousaazevedo/mz-backend:latest .
       - run:
           name: push image
