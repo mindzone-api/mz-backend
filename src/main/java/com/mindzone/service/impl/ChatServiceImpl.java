@@ -15,6 +15,7 @@ import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +49,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Cacheable("chat")
     public ChatResponse getChat(User user, String userId) {
         Optional<Chat> chatOp = chatRepository.findByUsersIdsContainingBoth(user.getId(), userId);
         Chat chat;
@@ -74,6 +76,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Cacheable("chat")
     public Page<ListedChat> getHistory(User user, MzPageRequest pageRequest) {
         Sort sort = Sort.by(Sort.Direction.DESC, "updatedAt");
         Pageable pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(), sort);
@@ -96,6 +99,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Cacheable("chat")
     public Page<ChatMessageResponse> getMessageHistory(User user, String chatId, MzPageRequest pageRequest) {
         Chat chat = getById(chatId);
         if (!chat.getUsersIds().contains(user.getId())) {

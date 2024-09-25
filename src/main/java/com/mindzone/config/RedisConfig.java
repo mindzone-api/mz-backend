@@ -32,7 +32,7 @@ public class RedisConfig {
 
         return RedisCacheManager.builder(redisConnectionFactory())
                 .cacheDefaults(cacheConfig)
-                .withCacheConfiguration("user", myDefaultCacheConfig(Duration.ofMinutes(5)))
+                .withCacheConfiguration("user", myDefaultCacheConfig(Duration.ofMinutes(20)))
                 .withCacheConfiguration("chat", myDefaultCacheConfig(Duration.ofMinutes(20)))
                 .withCacheConfiguration("prescription", myDefaultCacheConfig(Duration.ofMinutes(10)))
                 .withCacheConfiguration("questionnaire", myDefaultCacheConfig(Duration.ofMinutes(10)))

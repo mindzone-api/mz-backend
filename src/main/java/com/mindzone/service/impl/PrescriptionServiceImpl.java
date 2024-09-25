@@ -16,6 +16,7 @@ import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -84,6 +85,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     }
 
     @Override
+    @Cacheable("prescription")
     public PrescriptionResponse get(User user, String prescriptionId) {
         Prescription prescription = getById(prescriptionId);
         Therapy therapy = therapyService.getById(prescription.getTherapyId());
@@ -115,6 +117,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     }
 
     @Override
+    @Cacheable("prescription")
     public Page<ListedPrescription> getAll(User user, String therapyId, MzPageRequest pageRequest) {
         Therapy therapy = therapyService.getById(therapyId);
         canAccessPrescriptions(user, therapy);
@@ -150,6 +153,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     }
 
     @Override
+    @Cacheable("prescription")
     public List<ListedPrescription> getActivePrecriptions(
             User user,
             String therapyId,
