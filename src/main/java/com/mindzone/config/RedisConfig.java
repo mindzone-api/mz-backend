@@ -1,6 +1,7 @@
 package com.mindzone.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -8,7 +9,9 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
@@ -28,23 +31,25 @@ public class RedisConfig {
 
     @Bean
     public RedisCacheManager cacheManager() {
-        RedisCacheConfiguration cacheConfig = myDefaultCacheConfig(Duration.ofMinutes(10)).disableCachingNullValues();
+        RedisCacheConfiguration cacheConfig = defaultCacheConfig(Duration.ofMinutes(10)).disableCachingNullValues();
 
         return RedisCacheManager.builder(redisConnectionFactory())
                 .cacheDefaults(cacheConfig)
-                .withCacheConfiguration("user", myDefaultCacheConfig(Duration.ofMinutes(20)))
-                .withCacheConfiguration("chat", myDefaultCacheConfig(Duration.ofMinutes(20)))
-                .withCacheConfiguration("prescription", myDefaultCacheConfig(Duration.ofMinutes(10)))
-                .withCacheConfiguration("questionnaire", myDefaultCacheConfig(Duration.ofMinutes(10)))
-                .withCacheConfiguration("report", myDefaultCacheConfig(Duration.ofMinutes(10)))
-                .withCacheConfiguration("therapy", myDefaultCacheConfig(Duration.ofMinutes(15)))
+                .withCacheConfiguration("user", defaultCacheConfig(Duration.ofMinutes(20)))
+                .withCacheConfiguration("chat", defaultCacheConfig(Duration.ofMinutes(20)))
+                .withCacheConfiguration("prescription", defaultCacheConfig(Duration.ofMinutes(10)))
+                .withCacheConfiguration("questionnaire", defaultCacheConfig(Duration.ofMinutes(10)))
+                .withCacheConfiguration("report", defaultCacheConfig(Duration.ofMinutes(10)))
+                .withCacheConfiguration("therapy", defaultCacheConfig(Duration.ofMinutes(15)))
                 .build();
     }
 
-    private RedisCacheConfiguration myDefaultCacheConfig(Duration duration) {
-        return RedisCacheConfiguration
-                .defaultCacheConfig()
-                .entryTtl(duration)
-                .serializeValuesWith(SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+    private RedisCacheConfiguration defaultCacheConfig(Duration duration) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper)))
+                .entryTtl(duration);
     }
 }
