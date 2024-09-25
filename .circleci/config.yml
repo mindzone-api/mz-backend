@@ -28,8 +28,6 @@ jobs:
               --build-arg MONGODB_URI=$MONGODB_URI \
               --build-arg RABBITMQ_URI=$RABBITMQ_URI \
               --build-arg REDIS_HOST=$REDIS_HOST \
-              --build-arg MZ_MAIL_USERNAME=$MZ_MAIL_USERNAME \
-              --build-arg MZ_MAIL_PASSWORD=$MZ_MAIL_PASSWORD \
               -t viniciussousaazevedo/mz-backend:latest .
       - run:
           name: push image
