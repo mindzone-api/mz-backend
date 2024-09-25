@@ -1,7 +1,10 @@
 version: 2.1
 
+orbs:
+  docker: circleci/docker@2.7.1
+
 jobs:
-  build_and_push:
+  build:
     docker:
       - image: circleci/python:3.7
         auth:
@@ -26,17 +29,21 @@ jobs:
               --build-arg RABBITMQ_URI=$RABBITMQ_URI \
               --build-arg REDIS_HOST=$REDIS_HOST \
               -t viniciussousaazevedo/mz-backend:latest .
-      - run:
-          name: push image
-          command: |
-            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-            docker push viniciussousaazevedo/mz-backend:latest
 
 workflows:
   build_and_deploy:
     jobs:
-      - build_and_push:
+      - build:
           context: backend secrets
+          filters:
+            branches:
+              only:
+                - main
+                - circleci-project-setup
+      - docker/publish:
+          image: viniciussousaazevedo/mz-backend:latest
+          requires:
+            - build
           filters:
             branches:
               only:
