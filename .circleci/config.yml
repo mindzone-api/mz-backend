@@ -4,14 +4,13 @@ jobs:
   build_and_push:
     docker:
       - image: circleci/python:3.7
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
     steps:
       - checkout
       - setup_remote_docker:
             version: 20.10.7
-      - run:
-          name: docker login
-          command: |
-            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
       - run:
           name: run redis
           command: |
