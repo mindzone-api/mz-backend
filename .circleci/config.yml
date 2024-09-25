@@ -1,0 +1,49 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.7.1
+
+jobs:
+  build_and_push:
+    docker:
+      - image: circleci/python:3.7
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
+    steps:
+      - checkout
+      - setup_remote_docker:
+            version: 20.10.7
+      - run:
+          name: run redis
+          command: |
+            docker run -d --name redis -p 6379:6379 redis:alpine
+      - run:
+          name: build image
+          command: |
+            docker build \
+              --build-arg CHAT_MESSAGE_ENCRYPTION_KEY=$CHAT_MESSAGE_ENCRYPTION_KEY \
+              --build-arg GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
+              --build-arg GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
+              --build-arg MONGODB_URI=$MONGODB_URI \
+              --build-arg RABBITMQ_URI=$RABBITMQ_URI \
+              --build-arg REDIS_HOST=$REDIS_HOST \
+              --build-arg MZ_MAIL_USERNAME=$MZ_MAIL_USERNAME \
+              --build-arg MZ_MAIL_PASSWORD=$MZ_MAIL_PASSWORD \
+              -t viniciussousaazevedo/mz-backend:latest .
+      - run:
+          name: push image
+          command: |
+            docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+            docker push viniciussousaazevedo/mz-backend:latest
+
+
+workflows:
+  build_and_deploy:
+    jobs:
+      - build_and_push:
+          context: backend secrets
+          filters:
+            branches:
+              only:
+                - main
