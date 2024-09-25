@@ -48,11 +48,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable("user")
     public UserResponse whoAmI(User user) {
         return m.map(user, UserResponse.class);
     }
 
     @Override
+    @Cacheable("user")
     public UserResponse get(String id) {
         User user = getById(id);
         return m.map(user, UserResponse.class);
