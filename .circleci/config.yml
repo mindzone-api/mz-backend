@@ -9,6 +9,10 @@ jobs:
       - setup_remote_docker:
             version: 20.10.7
       - run:
+          name: docker login
+          command: |
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+      - run:
           name: run redis
           command: |
             docker run -d --name redis -p 6379:6379 redis:alpine
@@ -26,7 +30,6 @@ jobs:
       - run:
           name: push image
           command: |
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker push viniciussousaazevedo/mz-backend:latest
 
 workflows:
