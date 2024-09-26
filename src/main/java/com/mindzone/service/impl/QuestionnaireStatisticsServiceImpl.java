@@ -28,7 +28,7 @@ public class QuestionnaireStatisticsServiceImpl implements QuestionnaireStatisti
 
 
     @Override
-    @Cacheable("questionnaire")
+    @Cacheable("questionnaireGetStatistics")
     public QuestionnaireStatisticsResponse getStatistics(User professional, String userId, QuestionnaireStatisticsRequest request) {
         User patient = userService.getById(userId);
         q.canAccessQuestionnaire(professional, patient);

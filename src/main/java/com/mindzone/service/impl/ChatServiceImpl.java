@@ -49,7 +49,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    @Cacheable("chat")
+    @Cacheable("getChat")
     public ChatResponse getChat(User user, String userId) {
         Optional<Chat> chatOp = chatRepository.findByUsersIdsContainingBoth(user.getId(), userId);
         Chat chat;
@@ -76,7 +76,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    @Cacheable("chat")
+    @Cacheable("getHistory")
     public Page<ListedChat> getHistory(User user, MzPageRequest pageRequest) {
         Sort sort = Sort.by(Sort.Direction.DESC, "updatedAt");
         Pageable pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(), sort);
@@ -99,7 +99,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    @Cacheable("chat")
+    @Cacheable("getMessageHistory")
     public Page<ChatMessageResponse> getMessageHistory(User user, String chatId, MzPageRequest pageRequest) {
         Chat chat = getById(chatId);
         if (!chat.getUsersIds().contains(user.getId())) {

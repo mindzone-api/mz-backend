@@ -26,7 +26,7 @@ public class PatientServiceImpl implements PatientService {
     private UserService userService;
 
     @Override
-    @Cacheable("user")
+    @Cacheable("getMyProfessionals")
     public List<ListedProfessional> getMyProfessionals(User user) {
         List<Therapy> therapies = therapyRepository.findAllByPatientIdAndTherapyStatus(user.getId(), APPROVED);
         List<ListedProfessional> professionals = new ArrayList<>();
