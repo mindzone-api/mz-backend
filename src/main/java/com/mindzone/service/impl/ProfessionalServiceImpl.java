@@ -33,7 +33,7 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     private MailService mailService;
     private UserService userService;
     @Override
-    @Cacheable("user")
+    @Cacheable("getMyPatients")
     public List<ListedPatient> getMyPatients(User user) {
         List<Therapy> therapies = therapyRepository.findAllByProfessionalIdAndTherapyStatus(user.getId(), APPROVED);
         List<ListedPatient> patients = new ArrayList<>();
@@ -47,7 +47,7 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     }
 
     @Override
-    @Cacheable("user")
+    @Cacheable("getMyAllies")
     public List<ListedAlly> getMyAllies(User user) {
         List<Therapy> therapies = therapyRepository.findAllByProfessionalIdAndTherapyStatus(user.getId(), APPROVED);
         List<ListedAlly> allies = new ArrayList<>();
@@ -76,7 +76,7 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     }
 
     @Override
-    @Cacheable("user")
+    @Cacheable("getMyAlliesTherapies")
     public List<ListedTherapy> getMyAlliesTherapies(User professional) {
         List<ListedTherapy> response = new ArrayList<>();
 

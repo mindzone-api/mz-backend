@@ -94,7 +94,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
-    @Cacheable("questionnaire")
+    @Cacheable("questionnaireGet")
     public QuestionnaireResponse get(User user, String questionnaireId) {
         Questionnaire questionnaire = getById(questionnaireId);
         canAccessQuestionnaire(user, questionnaire);
@@ -102,7 +102,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
-    @Cacheable("questionnaire")
+    @Cacheable("questionnaireGetAll")
     public Page<ListedQuestionnaire> getAll(User user, String userId, MzPageRequest pageRequest) {
         User userToAccess = userService.getById(userId);
         canAccessQuestionnaire(user, userToAccess);

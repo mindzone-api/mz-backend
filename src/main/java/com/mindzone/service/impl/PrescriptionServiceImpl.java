@@ -85,7 +85,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     }
 
     @Override
-    @Cacheable("prescription")
+    @Cacheable("prescriptionGet")
     public PrescriptionResponse get(User user, String prescriptionId) {
         Prescription prescription = getById(prescriptionId);
         Therapy therapy = therapyService.getById(prescription.getTherapyId());
@@ -117,7 +117,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     }
 
     @Override
-    @Cacheable("prescription")
+    @Cacheable("prescriptionGetAll")
     public Page<ListedPrescription> getAll(User user, String therapyId, MzPageRequest pageRequest) {
         Therapy therapy = therapyService.getById(therapyId);
         canAccessPrescriptions(user, therapy);
@@ -153,7 +153,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     }
 
     @Override
-    @Cacheable("prescription")
+    @Cacheable("getActivePrecriptions")
     public List<ListedPrescription> getActivePrecriptions(
             User user,
             String therapyId,

@@ -74,7 +74,7 @@ public class TherapyServiceImpl implements TherapyService {
     }
 
     @Override
-    @Cacheable("therapy")
+    @Cacheable("therapyGet")
     public TherapyResponse get(User user, String id) {
         Therapy therapy = getById(id);
         canAccess(user, therapy);
@@ -87,7 +87,7 @@ public class TherapyServiceImpl implements TherapyService {
     }
 
     @Override
-    @Cacheable("therapy")
+    @Cacheable("therapyGetAll")
     public List<ListedTherapy> getAll(User user) {
         return (
                 user.getRole() == PATIENT ?

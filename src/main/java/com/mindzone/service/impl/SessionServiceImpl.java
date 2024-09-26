@@ -70,7 +70,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    @Cacheable("therapy")
+    @Cacheable("sessionGetAll")
     public Page<ListedSession> getAll(User user, String therapyId, MzPageRequest pageRequest) {
         Therapy therapy = therapyService.getById(therapyId);
         canAccessSessions(user, therapy);
@@ -119,7 +119,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    @Cacheable("therapy")
+    @Cacheable("sessionGet")
     public SessionResponse get(User user, String sessionId) {
         Session session = getById(sessionId);
         SessionResponse response;

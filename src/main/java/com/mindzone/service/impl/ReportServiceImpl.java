@@ -82,7 +82,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    @Cacheable("report")
+    @Cacheable("reportGet")
     public ReportResponse get(User professional, String reportId) {
         Report report = getById(reportId);
         Therapy therapy = therapyService.getById(report.getTherapyId());
@@ -93,7 +93,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    @Cacheable("report")
+    @Cacheable("reportGetAll")
     public List<ListedReportResponse> getAll(User professional, String therapyId) {
         Therapy therapy = therapyService.getById(therapyId);
         canAccessReports(professional, therapy);
