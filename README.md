@@ -5,6 +5,7 @@ Welcome to the MindZone backend repository! This project is a MVC Spring Boot me
 The backend of MindZone is built with the following technologies:
 
 - MongoDB
+- CircleCI
 - OAuth2 with Google
 - RabbitMQ (manages asynchronous communication for email notifications)
 - Redis
