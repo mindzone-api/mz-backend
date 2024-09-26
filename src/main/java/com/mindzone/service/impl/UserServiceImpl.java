@@ -16,6 +16,7 @@ import com.mindzone.repository.UserRepository;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -47,23 +48,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable("user")
     public UserResponse whoAmI(User user) {
         return m.map(user, UserResponse.class);
     }
 
     @Override
+    @Cacheable("user")
     public UserResponse get(String id) {
         User user = getById(id);
         return m.map(user, UserResponse.class);
     }
 
     @Override
+    @Cacheable("user")
     public User validate(JwtAuthenticationToken token) {
         return userRepository.findByEmail((String) token.getTokenAttributes().get("email"))
                 .orElseThrow(() -> new ApiRequestException(OAUTH_USER_NOT_FOUND));
     }
 
     @Override
+    @Cacheable("user")
     public User validate(JwtAuthenticationToken token, Role role) {
         User user = validate(token);
         if (user.getRole() != role) {
@@ -73,6 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable("user")
     public User validate(JwtAuthenticationToken token, Profession profession) {
         User user = validate(token, PROFESSIONAL);
         if (user.getProfessionalInfo().getProfession() != profession) {
@@ -120,6 +126,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable("user")
     public boolean isAlly(User professional, Therapy therapy) {
         boolean isAlly = false;
         List<Therapy> patientTherapies = therapyRepository.findAllByPatientIdAndActiveIsTrue(therapy.getPatientId());
@@ -133,6 +140,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable("user")
     public boolean isAlly(User u1, User u2) {
         boolean isAlly = false;
         List<Therapy> u1Therapies = therapyRepository.findAllByProfessionalIdAndActiveIsTrue(u1.getId());

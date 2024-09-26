@@ -138,7 +138,7 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
 
             // Automatically cancelling all therapy requests that the patient made to other professionals with the same profession
             List<Therapy> sameProfessionPatientPendingTherapies = patientPendingTherapies.stream().filter(
-                    t -> userService.get(t.getProfessionalId()).getProfessionalInfo().getProfession() == professional.getProfessionalInfo().getProfession()
+                    t -> userService.getById(t.getProfessionalId()).getProfessionalInfo().getProfession() == professional.getProfessionalInfo().getProfession()
             ).toList();
             for (Therapy th : sameProfessionPatientPendingTherapies) {
                 th.setTherapyStatus(CANCELED);

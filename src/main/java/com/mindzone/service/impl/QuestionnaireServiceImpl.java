@@ -15,6 +15,7 @@ import com.mindzone.service.interfaces.TherapyService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -93,6 +94,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
+    @Cacheable("questionnaire")
     public QuestionnaireResponse get(User user, String questionnaireId) {
         Questionnaire questionnaire = getById(questionnaireId);
         canAccessQuestionnaire(user, questionnaire);
@@ -100,6 +102,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
+    @Cacheable("questionnaire")
     public Page<ListedQuestionnaire> getAll(User user, String userId, MzPageRequest pageRequest) {
         User userToAccess = userService.getById(userId);
         canAccessQuestionnaire(user, userToAccess);

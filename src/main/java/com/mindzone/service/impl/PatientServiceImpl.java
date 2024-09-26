@@ -10,6 +10,7 @@ import com.mindzone.service.interfaces.PatientService;
 import com.mindzone.service.interfaces.UserService;
 import com.mindzone.util.UltimateModelMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class PatientServiceImpl implements PatientService {
     private UserService userService;
 
     @Override
+    @Cacheable("user")
     public List<ListedProfessional> getMyProfessionals(User user) {
         List<Therapy> therapies = therapyRepository.findAllByPatientIdAndTherapyStatus(user.getId(), APPROVED);
         List<ListedProfessional> professionals = new ArrayList<>();
