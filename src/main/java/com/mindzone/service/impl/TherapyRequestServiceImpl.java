@@ -114,6 +114,32 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
             t.save(therapy);
 
         } else if (analysis.getStatus() == APPROVED) {
+            // update and save
+            therapy.setTherapyStatus(analysis.getStatus());
+            therapy.setUrl(analysis.getApprovalSessionsUrl());
+            therapy.setActive(true);
+
+            Session session = Session.builder()
+                    .therapyId(id)
+                    .date(getNextOccurrence(therapy.getSchedule(), new Date()))
+                    .build();
+            Date now = new Date();
+            session.setCreatedAt(now);
+            session.setUpdatedAt(now);
+            sessionRepository.save(session);
+            therapy.setNextSessionId(session.getId());
+            therapy.setSince(now);
+            t.save(therapy);
+
+            // notify patient about professional final analysis
+            mailService.sendMail(
+                    approvedTherapyRequestMail(patient.getEmail(), professional.getName())
+            );
+
+            // Updates professional availability based on the current therapy in analysis
+            removeFrom(professional.getProfessionalInfo().getAvailability(), therapy.getSchedule());
+            userService.save(professional);
+
             // Automatically cancelling all therapy requests to the current professional that overlaps the therapy in analysis
             List<Therapy> professionalPendingTherapies = therapyRepository.findAllByProfessionalIdAndTherapyStatus(professional.getId(), PENDING);
             for (Therapy pendingTherapy : professionalPendingTherapies) {
@@ -144,32 +170,6 @@ public class TherapyRequestServiceImpl implements TherapyRequestService {
                 th.setTherapyStatus(CANCELED);
                 t.save(th);
             }
-
-            // Updates professional availability based on the current therapy in analysis
-            removeFrom(professional.getProfessionalInfo().getAvailability(), therapy.getSchedule());
-            userService.save(professional);
-
-            // update and save
-            therapy.setTherapyStatus(analysis.getStatus());
-            therapy.setUrl(analysis.getApprovalSessionsUrl());
-            therapy.setActive(true);
-
-            Session session = Session.builder()
-                    .therapyId(id)
-                    .date(getNextOccurrence(therapy.getSchedule(), new Date()))
-                    .build();
-            Date now = new Date();
-            session.setCreatedAt(now);
-            session.setUpdatedAt(now);
-            sessionRepository.save(session);
-            therapy.setNextSessionId(session.getId());
-            therapy.setSince(now);
-            t.save(therapy);
-
-            // notify patient about professional final analysis
-            mailService.sendMail(
-                    approvedTherapyRequestMail(patient.getEmail(), professional.getName())
-            );
         }
 
         return m.map(therapy, TherapyResponse.class);
