@@ -26,7 +26,7 @@ jobs:
               --build-arg REDIS_HOST="$REDIS_HOST" \
               --build-arg MZ_MAIL_USERNAME="$MZ_MAIL_USERNAME" \
               --build-arg MZ_MAIL_PASSWORD="$MZ_MAIL_PASSWORD" \
-              -t viniciussousaazevedo/mz-backend:latest ./docker
+              -t viniciussousaazevedo/mz-backend:latest -f docker/Dockerfile .
       - run:
           name: push image
           command: |
