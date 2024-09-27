@@ -29,7 +29,7 @@ ENV MZ_MAIL_USERNAME=$MZ_MAIL_USERNAME
 ENV MZ_MAIL_PASSWORD=$MZ_MAIL_PASSWORD
 
 WORKDIR /app
-COPY . /app/mz-backend
+COPY .. /app/mz-backend
 WORKDIR /app/mz-backend
 RUN chmod +x ./mvnw
 RUN ./mvnw clean package

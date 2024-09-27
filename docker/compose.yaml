@@ -1,0 +1,20 @@
+services:
+  redis:
+    image: redis
+    container_name: redis
+    networks:
+      - mz-network
+
+  spring-app:
+    image: viniciussousaazevedo/mz-backend
+    container_name: mz-backend
+    ports:
+      - "8080:8080"
+    networks:
+      - mz-network
+    depends_on:
+      - redis
+
+networks:
+  mz-network:
+    driver: bridge
